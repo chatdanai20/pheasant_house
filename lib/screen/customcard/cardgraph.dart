@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:pheasant_house/screen/chartscreen/chartscreen2.dart';
+import 'package:pheasant_house/screen/chartscreen/chartscreen3.dart';
+import 'package:pheasant_house/screen/chartscreen/chartscreen4.dart';
+import 'package:pheasant_house/screen/chartscreen/chartscreen5.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../constants.dart';
-import '../chartscreen/chartscreen.dart';
+import '../chartscreen/chartscreen1.dart';
 
 class CardGraph extends StatefulWidget {
   const CardGraph({super.key});
@@ -11,6 +16,8 @@ class CardGraph extends StatefulWidget {
 }
 
 class _CardGraphState extends State<CardGraph> {
+  final PageController _controller = PageController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -33,7 +40,30 @@ class _CardGraphState extends State<CardGraph> {
           SizedBox(
             height: MediaQuery.of(context).size.height / 3.5,
             width: MediaQuery.of(context).size.width / 1.6,
-            child: ChartBar(),
+            child: Stack(
+              children: [
+                PageView(
+                  controller: _controller,
+                  children: [
+                    const LineChart1(),
+                    ChartBar2(),
+                    ChartBar3(),
+                    ChartBar4(),
+                    ChartBar5(),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SmoothPageIndicator(
+            controller: _controller,
+            count: 5,
+            effect: const ExpandingDotsEffect(
+              dotHeight: 14,
+            ),
+          ),
+          const SizedBox(
+            height: 10,
           ),
           Container(
             width: MediaQuery.of(context).size.width / 1.6,
@@ -111,7 +141,7 @@ class _CardGraphState extends State<CardGraph> {
             color: Colors.grey.withOpacity(0.9),
             spreadRadius: 1,
             blurRadius: 1,
-            offset: const Offset(0, 0.5), // changes position of shadow
+            offset: const Offset(0, 0.5),
           ),
         ],
       ),
