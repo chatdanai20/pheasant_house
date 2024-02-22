@@ -134,7 +134,7 @@ class _MenuScreenState extends State<MenuScreen> {
       case 0:
         return 'li';
       case 1:
-        return 'Rectangle78';
+        return 'fan';
       case 2:
         return 'Vector';
       case 3:

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pheasant_house/screen/popupscreen/Timescreen.dart';
 import 'package:pheasant_house/screen/popupscreen/customdropdown.dart';
 
 class PopupTemp extends StatefulWidget {
@@ -1350,10 +1349,11 @@ class _PopupCleanState extends State<PopupClean> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF5B68DD),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      )),
+                    backgroundColor: const Color(0xFF5B68DD),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   child: const Text(
                     'ตกลง',
                     style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 18),

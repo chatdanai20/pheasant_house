@@ -45,7 +45,10 @@ class _CardAmmoniaState extends State<CardAmmonia> {
       child: Column(
         children: [
           sizedBox,
-          Image.asset('asset/images/Rectangle78.png'),
+          Image.asset(
+            'asset/images/fan.png',
+            scale: 4,
+          ),
           sizedBox,
           buildStatusRow(),
           buildSwitchRow(
@@ -59,7 +62,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                   MaterialPageRoute(builder: (context) => const PopupTemp()));
             },
             child: buildInfoContainer(
-                'อุณหภูมิ', ' C', 'asset/images/Rectangle78.png', 7),
+                'อุณหภูมิ', ' C', 'asset/images/fan.png', 20),
           ),
           sizedBox,
           GestureDetector(
@@ -71,6 +74,16 @@ class _CardAmmoniaState extends State<CardAmmonia> {
               },
               child: buildInfoContainer(
                   'แอมโมเนียม', ' pH', 'asset/images/image3.png', 4)),
+          sizedBox,
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PopupSmell()));
+              },
+              child: buildInfoContainer(
+                  'ความชื้น', ' C', 'asset/images/Vector.png', 6)),
         ],
       ),
     );
