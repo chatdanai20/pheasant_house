@@ -77,24 +77,6 @@ class _CardGraphState extends State<CardGraph> {
               ],
             ),
           ),
-          // SizedBox(
-          //   height: MediaQuery.of(context).size.height / 3.7,
-          //   width: MediaQuery.of(context).size.width / 1.6,
-          //   child: Stack(
-          //     children: [
-          //       PageView(
-          //         controller: _controller,
-          //         children: [
-          //           exportData('ความเข้มแสง'),
-          //           exportData('อุณหภูมิ'),
-          //           exportData('ความชื้นในอากาศ'),
-          //           exportData('ความชื้นในดิน'),
-          //           exportData('แอมโมเนีย'),
-          //         ],
-          //       ),
-          //     ],
-          //   ),
-          // ),
           const SizedBox(
             height: 10,
           ),

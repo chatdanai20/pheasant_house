@@ -1,7 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pheasant_house/constants.dart';
-
-import '../popupscreen/popupscreen.dart';
 
 class CardHeat extends StatefulWidget {
   const CardHeat({super.key});
@@ -16,8 +15,8 @@ class _CardHeatState extends State<CardHeat> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width / 1.3,
-      height: MediaQuery.of(context).size.height / 1.7,
+      width: MediaQuery.of(context).size.width / 1.2,
+      height: MediaQuery.of(context).size.height / 1.5,
       decoration: const BoxDecoration(
         color: Color(0xFFFFFFFF),
         borderRadius: BorderRadius.only(
@@ -29,7 +28,9 @@ class _CardHeatState extends State<CardHeat> {
       ),
       child: Column(
         children: [
-          sizedBox,
+          const SizedBox(
+            height: 10,
+          ),
           Image.asset('asset/images/lamp.png'),
           sizedBox,
           Row(
@@ -105,55 +106,241 @@ class _CardHeatState extends State<CardHeat> {
               ),
             ],
           ),
-          sizedBox,
-          Column(
-            children: [
-              const Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: 30, bottom: 10),
-                    child: Text(
-                      'ความเข้มแสง',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const PopupTemp()));
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width / 1.6,
-                  height: MediaQuery.of(context).size.height / 20,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF6FC0C5),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(14),
-                    ),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          ' C',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+          const SizedBox(
+            height: 10,
+          ),
+          ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(const Color(0xFF00BFA5))),
+            child: const Text(
+              'ตั้งค่าการทำงานอัตโนมัติ',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      int selectedOpenHour = 0;
+                      int selectedOpenMinute = 0;
+                      int selectedCloseHour = 0;
+                      int selectedCloseMinute = 0;
+
+                      Widget buildPicker(int count, int selectedItem,
+                          ValueChanged<int> onChanged) {
+                        return Expanded(
+                          child: CupertinoPicker(
+                            itemExtent: 32,
+                            scrollController: FixedExtentScrollController(
+                                initialItem: selectedItem),
+                            onSelectedItemChanged: onChanged,
+                            children: List<Widget>.generate(
+                                count, (int index) => Text('$index')),
+                          ),
+                        );
+                      }
+
+                      return SizedBox(
+                        height: 500,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 6),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ElevatedButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  const Color(0xFF6FC0C5))),
+                                      child: const Text(
+                                        'กลับ',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      onPressed: () => Navigator.pop(context),
+                                    ),
+                                    ElevatedButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  const Color(0xFF6FC0C5))),
+                                      child: const Text(
+                                        'บันทึก',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        print(
+                                            "Hour: $selectedOpenHour, Minute: $selectedOpenMinute");
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              buildInputText('ค่าเซนเซอร์เปิด ', 'อุณหภูมิ'),
+                              buildInputText('ค่าเซนเซอร์ปิด ', 'อุณหภูมิ'),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              const Text(
+                                'เวลาเปิด',
+                                style: TextStyle(
+                                    color: Color(0xFF6FC0C5), fontSize: 16),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  buildPicker(
+                                      24,
+                                      selectedOpenHour,
+                                      (int newVal) => setState(
+                                          () => selectedOpenHour = newVal)),
+                                  buildPicker(
+                                      60,
+                                      selectedOpenMinute,
+                                      (int newVal) => setState(
+                                          () => selectedOpenMinute = newVal)),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              const Text(
+                                'เวลาปิด',
+                                style: TextStyle(
+                                    color: Color(0xFF6FC0C5), fontSize: 16),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  buildPicker(
+                                    24,
+                                    selectedCloseHour,
+                                    (int newVal) => setState(
+                                        () => selectedCloseHour = newVal),
+                                  ),
+                                  buildPicker(
+                                    60,
+                                    selectedCloseMinute,
+                                    (int newVal) => setState(
+                                        () => selectedCloseMinute = newVal),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                ' ค่าเซนเซอร์เปิด :',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                ' 40 °C',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                ' ค่าเซนเซอร์ปิด :',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                ' 25 °C',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'เวลาเปิด ',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '08 : 00 น.',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'เวลาเปิด ',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '19 : 00 น.',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
@@ -162,4 +349,42 @@ class _CardHeatState extends State<CardHeat> {
       ),
     );
   }
+}
+
+Widget buildInputText(String name, String nameHint) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 30),
+        child: Text(
+          name,
+          style: const TextStyle(color: Color(0xFF6FC0C5), fontSize: 16),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
+        child: Container(
+          width: 330.0,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF6FC0C5),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: TextField(
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: nameHint,
+              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+            ),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+            cursorColor: Colors.white,
+          ),
+        ),
+      ),
+    ],
+  );
 }

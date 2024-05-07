@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pheasant_house/screen/menuscreen/menuscreen.dart';
+import 'package:pheasant_house/screen/mainscreen/mainscreen.dart';
+import 'package:pheasant_house/screen/profileScreen/profilescreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -73,10 +74,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               print('Notification tapped');
                               break;
                             case 'information':
-                              print('Information tapped');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ProfileScreen(),
+                                ),
+                              );
                               break;
                             case 'logout':
-                              print('Logout tapped');
                               Navigator.pop(context);
                               break;
                           }
@@ -158,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const MenuScreen(),
+                            builder: (context) => const MainScreen(),
                           ),
                         );
                       },

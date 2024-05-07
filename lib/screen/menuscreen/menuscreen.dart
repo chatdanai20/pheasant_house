@@ -8,7 +8,7 @@ import '../customcard/cardgraph.dart';
 import '../customcard/cardmoisture.dart';
 
 class MenuScreen extends StatefulWidget {
-  const MenuScreen({Key? key}) : super(key: key);
+  const MenuScreen({super.key});
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -31,7 +31,7 @@ class _MenuScreenState extends State<MenuScreen> {
         children: [
           SizedBox(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height / 9,
+            height: MediaQuery.of(context).size.height / 10,
             child: Column(
               children: [
                 Padding(
@@ -90,7 +90,7 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
           Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height / 1.16,
+            height: MediaQuery.of(context).size.height / 1.12,
             decoration: const BoxDecoration(
               color: kPrimaryColor,
               borderRadius: BorderRadius.only(
@@ -101,7 +101,7 @@ class _MenuScreenState extends State<MenuScreen> {
             child: Column(
               children: [
                 const SizedBox(
-                  height: kDefaultPadding * 2.5,
+                  height: kDefaultPadding * 0.8,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -111,7 +111,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ],
                 ),
                 const SizedBox(
-                  height: kDefaultPadding * 2.5,
+                  height: kDefaultPadding * 0.8,
                 ),
                 cards[getSelectedIndex()],
               ],
