@@ -38,20 +38,6 @@ class _ChartBar5 extends State<ChartBar5> {
             ),
           ),
         ),
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'ความชื้น',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }

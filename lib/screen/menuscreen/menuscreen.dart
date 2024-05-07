@@ -48,20 +48,13 @@ class _MenuScreenState extends State<MenuScreen> {
                           size: 40,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 1, top: 1),
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.asset(
-                              'asset/images/pheasant_house1.png',
-                            ),
+                      SizedBox(
+                        width: 70,
+                        height: 70,
+                        child: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Image.asset(
+                            'asset/images/Logo.png',
                           ),
                         ),
                       ),
@@ -99,7 +92,7 @@ class _MenuScreenState extends State<MenuScreen> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height / 1.16,
             decoration: const BoxDecoration(
-              color: kSecondaryColor,
+              color: kPrimaryColor,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(50),
                 topRight: Radius.circular(50),
@@ -134,15 +127,15 @@ class _MenuScreenState extends State<MenuScreen> {
       case 0:
         return 'li';
       case 1:
-        return 'fan';
+        return 'Rectangle78';
       case 2:
-        return 'Vector';
+        return 'icon3';
       case 3:
         return 'image4';
       case 4:
-        return 'carbon_clean';
+        return 'icon_clean';
       default:
-        return 'li';
+        return '';
     }
   }
 

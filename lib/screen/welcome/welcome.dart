@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pheasant_house/screen/registerscreen/register.dart';
 
+import '../../constants.dart';
 import '../loginscreen/login.dart';
 
 class Welcomescreen extends StatefulWidget {
@@ -14,29 +15,65 @@ class _WelcomescreenState extends State<Welcomescreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF7EA48F),
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.only(top: 150),
+            padding: const EdgeInsets.only(top: 120),
             child: Column(
               children: [
                 Container(
                   margin: const EdgeInsets.only(bottom: 50),
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Image.asset('asset/images/pheasant_house1.png'),
+                  width: 330,
+                  height: 250,
+                  child: Image.asset(
+                    'asset/images/Logo2.png',
                   ),
                 ),
-                buildText('Welcome'),
-                buildText('To'),
-                buildText('Pheant House'),
+                Stack(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 50),
+                      width: 330,
+                      height: 280,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Image.asset('asset/images/watermark.png',
+                          opacity: const AlwaysStoppedAnimation(0.45),
+                          fit: BoxFit.none),
+                    ),
+                    const Positioned.fill(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Column(
+                          children: [
+                            Text(
+                              'Welcome',
+                              style: TextStyle(
+                                fontSize: 30,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              'To Automatic',
+                              style: TextStyle(
+                                fontSize: 30,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              'Pheasant House',
+                              style: TextStyle(
+                                fontSize: 30,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
@@ -45,7 +82,7 @@ class _WelcomescreenState extends State<Welcomescreen> {
       bottomNavigationBar: SizedBox(
         height: 90,
         child: Container(
-          color: const Color(0xFF455F54),
+          color: const Color(0xFF086D71).withOpacity(0.6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -59,7 +96,7 @@ class _WelcomescreenState extends State<Welcomescreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFA5C1B3),
+                  backgroundColor: kBottomColor,
                   elevation: 5,
                 ),
                 child: const Padding(
@@ -80,7 +117,7 @@ class _WelcomescreenState extends State<Welcomescreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFA5C1B3),
+                  backgroundColor: kBottomColor,
                   elevation: 5,
                 ),
                 child: const Padding(

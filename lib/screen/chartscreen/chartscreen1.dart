@@ -1,14 +1,14 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class LineChart1 extends StatefulWidget {
-  const LineChart1({super.key});
+class ChartBar1 extends StatefulWidget {
+  const ChartBar1({super.key});
 
   @override
-  State<LineChart1> createState() => _LineChart1State();
+  State<ChartBar1> createState() => _ChartBar1State();
 }
 
-class _LineChart1State extends State<LineChart1> {
+class _ChartBar1State extends State<ChartBar1> {
   List<Color> gradientColors = [
     Colors.cyan,
     Colors.blue,
@@ -32,20 +32,6 @@ class _LineChart1State extends State<LineChart1> {
               mainData(),
             ),
           ),
-        ),
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'ความสว่าง',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-              ),
-            ),
-          ],
         ),
       ],
     );

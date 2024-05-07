@@ -22,7 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF7EA48F),
       body: SafeArea(
         child: Column(
           children: [
@@ -33,20 +32,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 1, top: 1),
-                        child: Container(
-                          width: 70,
-                          height: 70,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child:
-                                Image.asset('asset/images/pheasant_house1.png'),
-                          ),
+                      SizedBox(
+                        width: 80,
+                        height: 80,
+                        child: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Image.asset('asset/images/Logo2.png'),
                         ),
                       ),
                       const SizedBox(
@@ -73,12 +64,44 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  const Row(
+                  Row(
                     children: [
-                      Icon(
-                        Icons.notifications_none,
-                        color: Colors.black,
-                        size: 50,
+                      PopupMenuButton<String>(
+                        onSelected: (String value) {
+                          switch (value) {
+                            case 'notification':
+                              print('Notification tapped');
+                              break;
+                            case 'information':
+                              print('Information tapped');
+                              break;
+                            case 'logout':
+                              print('Logout tapped');
+                              Navigator.pop(context);
+                              break;
+                          }
+                        },
+                        itemBuilder: (BuildContext context) =>
+                            <PopupMenuEntry<String>>[
+                          const PopupMenuItem<String>(
+                            value: 'notification',
+                            child: Text('Notification'),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'information',
+                            child: Text('Information'),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'logout',
+                            child: Text('Logout'),
+                          ),
+                        ],
+                        icon: Image.asset(
+                          'asset/images/list.png',
+                          width: 35,
+                          height: 35,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),

@@ -38,20 +38,6 @@ class _ChartBar4 extends State<ChartBar4> {
             ),
           ),
         ),
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'ทำความสะอาด',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }

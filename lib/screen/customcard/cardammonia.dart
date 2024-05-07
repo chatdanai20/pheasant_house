@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pheasant_house/constants.dart';
 
 import '../popupscreen/popupscreen.dart';
 
@@ -44,27 +43,34 @@ class _CardAmmoniaState extends State<CardAmmonia> {
       ),
       child: Column(
         children: [
-          sizedBox,
+          const SizedBox(
+            height: 5,
+          ),
           Image.asset(
             'asset/images/fan.png',
-            scale: 4,
+            scale: 1.1,
           ),
-          sizedBox,
+          const SizedBox(
+            height: 5,
+          ),
           buildStatusRow(),
           buildSwitchRow(
               'เปิด/ปิด', isOpen, (value) => setState(() => isOpen = value)),
           buildSwitchRow(
               'อัตโนมัติ', isAuto, (value) => setState(() => isAuto = value)),
-          sizedBox,
+          const SizedBox(
+            height: 5,
+          ),
           GestureDetector(
             onTap: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const PopupTemp()));
             },
-            child: buildInfoContainer(
-                'อุณหภูมิ', ' C', 'asset/images/fan.png', 20),
+            child: buildInfoContainer('อุณหภูมิ', ' C', 20),
           ),
-          sizedBox,
+          const SizedBox(
+            height: 5,
+          ),
           GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -72,9 +78,10 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                     MaterialPageRoute(
                         builder: (context) => const PopupSmell()));
               },
-              child: buildInfoContainer(
-                  'แอมโมเนียม', ' pH', 'asset/images/image3.png', 4)),
-          sizedBox,
+              child: buildInfoContainer('ความชื้นในอากาศ', ' %', 6)),
+          const SizedBox(
+            height: 5,
+          ),
           GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -82,8 +89,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                     MaterialPageRoute(
                         builder: (context) => const PopupSmell()));
               },
-              child: buildInfoContainer(
-                  'ความชื้น', ' C', 'asset/images/Vector.png', 6)),
+              child: buildInfoContainer('แอมโมเนีย', ' pH', 4)),
         ],
       ),
     );
@@ -136,34 +142,48 @@ class _CardAmmoniaState extends State<CardAmmonia> {
     );
   }
 
-  Widget buildInfoContainer(
-      String title, String unit, String imageAsset, double scale) {
-    return Container(
-      width: MediaQuery.of(context).size.width / 1.6,
-      height: MediaQuery.of(context).size.height / 20,
-      decoration: const BoxDecoration(
-        color: Color(0xFF6FC0C5),
-        borderRadius: BorderRadius.all(
-          Radius.circular(14),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget buildInfoContainer(String title, String unit, double scale) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
+            Padding(
+              padding: const EdgeInsets.only(left: 30),
+              child: Text(title,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width / 1.6,
+          height: MediaQuery.of(context).size.height / 20,
+          decoration: const BoxDecoration(
+            color: Color(0xFF6FC0C5),
+            borderRadius: BorderRadius.all(
+              Radius.circular(14),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Image.asset(
-                  imageAsset,
-                  scale: scale,
+                const Row(
+                  children: [
+                    SizedBox(
+                      width: 10,
+                    ),
+                  ],
                 ),
                 const SizedBox(
-                  width: 10,
+                  width: 30,
                 ),
                 Text(
-                  title,
+                  unit,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -171,19 +191,9 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                 ),
               ],
             ),
-            const SizedBox(
-              width: 30,
-            ),
-            Text(
-              unit,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

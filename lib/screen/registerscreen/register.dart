@@ -1,65 +1,93 @@
 import 'package:flutter/material.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
+  State<RegisterScreen> createState() => _RegisterScreen();
+}
+
+class _RegisterScreen extends State<RegisterScreen> {
+  String groupValue = 'yes';
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF7EA48F),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+            size: 24,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+        title: const Text('ลงทะเบียน', style: TextStyle(color: Colors.white)),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                buildInputText('Username', 'Your Username'),
+                buildInputText('Password', 'Your Password'),
+                buildInputText('Name', 'Your Name'),
+                buildInputText('Lastname', 'Your Lastname'),
+                buildInputText('Gender', 'Your Gender'),
+                buildInputText('Email', 'Your Email'),
+                buildInputText('Phone', 'Your Phone'),
+                buildInputText('Address', 'Your Address'),
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Row(
-                            children: [
-                              Icon(Icons.arrow_back_ios,
-                                  color: Colors.white, size: 30),
-                              Text(
-                                'Back',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 20),
-                              ),
-                            ],
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Row(
+                        children: [
+                          Radio(
+                              value: '1',
+                              groupValue: groupValue,
+                              onChanged: (value) {
+                                setState(() {
+                                  groupValue = value!;
+                                });
+                              }),
+                          Text(
+                            'เจ้าของฟาร์ม',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                      ]),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 30),
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(100),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Radio(
+                              value: '2',
+                              groupValue: groupValue,
+                              onChanged: (value) {
+                                setState(() {
+                                  groupValue = value!;
+                                });
+                              }),
+                          Text(
+                            'ลูกจ้าง',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Image.asset('asset/images/pheasant_house1.png'),
-                  ),
                 ),
-                buildText('ลงทะเบียน'),
-                buildText('Pheant house'),
-                buildTextFormField('Email', Icons.person),
-                buildTextFormField('Email', Icons.person),
-                buildTextFormField('Password', Icons.lock, isPassword: true),
-                buildTextFormField('Password', Icons.lock, isPassword: true),
-                const SizedBox(
-                  height: 10,
-                ),
-                const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
                   height: 50,
@@ -67,7 +95,9 @@ class RegisterScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFFFFF), elevation: 5),
+                      backgroundColor: const Color(0xFFFFFFFF),
+                      elevation: 5,
+                    ),
                     child: const Text(
                       'ลงทะเบียน',
                       style: TextStyle(color: Colors.black, fontSize: 20),
@@ -81,58 +111,43 @@ class RegisterScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-Widget buildText(String text) {
-  return Text(text, style: const TextStyle(fontSize: 36, color: Colors.white));
-}
-
-Widget buildTextFormField(String hintText, IconData iconData,
-    {bool isPassword = false}) {
-  return Stack(
-    alignment: Alignment.centerLeft,
-    children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        child: TextFormField(
-          obscureText: isPassword,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-            filled: true,
-            fillColor: Colors.white.withOpacity(0.3),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.white, width: 2),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.white, width: 2),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 20),
+  Widget buildInputText(String name, String nameHint) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 30),
+          child: Text(
+            name,
+            style:
+                TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16),
           ),
-          textAlign: TextAlign.center,
         ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(left: 10),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(75),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
           child: Container(
-            color: Colors.white,
-            height: 75,
-            width: 75,
-            child: Center(
-              child: Icon(
-                iconData,
-                color: Colors.black,
-                size: 40,
+            width: 330.0,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: const Color(0xFFD9D9D9).withOpacity(0.5),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: TextField(
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: nameHint,
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
               ),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+              cursorColor: Colors.white,
             ),
           ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }

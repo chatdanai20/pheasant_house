@@ -32,6 +32,18 @@ class _CardCleanState extends State<CardClean> {
           const SizedBox(
             height: 50,
           ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 30, bottom: 5),
+                child: Text('วันทำความสะอาด',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
           Container(
             width: MediaQuery.of(context).size.width / 1.6,
             height: MediaQuery.of(context).size.height / 20,
@@ -41,31 +53,13 @@ class _CardCleanState extends State<CardClean> {
                 Radius.circular(14),
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Image.asset('asset/images/carbon_clean.png', scale: 6.5),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Text(
-                        'วันทำความสะอาด :',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    width: 30,
-                  ),
-                  const Icon(
+                  Icon(
                     Icons.calendar_month,
                     size: 25,
                   )
@@ -74,6 +68,17 @@ class _CardCleanState extends State<CardClean> {
             ),
           ),
           sizedBox,
+          const Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 30, bottom: 5),
+                child: Text(
+                  'เวลา',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
           Container(
             width: MediaQuery.of(context).size.width / 1.6,
             height: MediaQuery.of(context).size.height / 20,
@@ -83,32 +88,14 @@ class _CardCleanState extends State<CardClean> {
                 Radius.circular(14),
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Image.asset('asset/images/carbon_clean.png', scale: 6.5),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      const Text(
-                        'เวลา :',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    width: 30,
-                  ),
-                  const Text(
-                    ' วัน',
+                  Text(
+                    'วัน',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

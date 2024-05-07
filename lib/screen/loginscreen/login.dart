@@ -7,7 +7,6 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF7EA48F),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
@@ -38,27 +37,20 @@ class LoginScreen extends StatelessWidget {
                 ),
                 Container(
                   margin: const EdgeInsets.only(bottom: 30),
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Image.asset('asset/images/pheasant_house1.png'),
-                  ),
+                  width: 330,
+                  height: 250,
+                  child: Image.asset('asset/images/Logo2.png'),
                 ),
-                buildText('เข้าสู่ระบบ'),
-                buildText('Pheant house'),
-                buildTextFormField('Email', Icons.email),
+                buildText('Welcome To Automatics'),
+                buildText(' Pheasant House'),
+                buildTextFormField('Email', Icons.account_circle),
                 buildTextFormField('Password', Icons.lock, isPassword: true),
                 const SizedBox(
                   height: 10,
                 ),
                 const Text(
-                  'Forgot Password?',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  'ลืมรหัสผ่าน?',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 const SizedBox(height: 10),
                 Container(
@@ -92,7 +84,7 @@ class LoginScreen extends StatelessWidget {
 }
 
 Widget buildText(String text) {
-  return Text(text, style: const TextStyle(fontSize: 36, color: Colors.white));
+  return Text(text, style: const TextStyle(fontSize: 30, color: Colors.white));
 }
 
 Widget buildTextFormField(String hintText, IconData iconData,
@@ -104,12 +96,12 @@ Widget buildTextFormField(String hintText, IconData iconData,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         child: TextFormField(
           obscureText: isPassword,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: Color(0xFFD9D9D9)),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.3),
+            fillColor: const Color(0xFFD9D9D9).withOpacity(0.5),
             focusedBorder: OutlineInputBorder(
               borderSide: const BorderSide(color: Colors.white, width: 2),
               borderRadius: BorderRadius.circular(20),

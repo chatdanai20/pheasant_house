@@ -106,37 +106,46 @@ class _CardHeatState extends State<CardHeat> {
             ],
           ),
           sizedBox,
-          GestureDetector(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const PopupTemp()));
-            },
-            child: Container(
-              width: MediaQuery.of(context).size.width / 1.6,
-              height: MediaQuery.of(context).size.height / 20,
-              decoration: const BoxDecoration(
-                color: Color(0xFF6FC0C5),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(14),
-                ),
+          Column(
+            children: [
+              const Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 30, bottom: 10),
+                    child: Text(
+                      'ความเข้มแสง',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const PopupTemp()));
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width / 1.6,
+                  height: MediaQuery.of(context).size.height / 20,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF6FC0C5),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(14),
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Image.asset(
-                          'asset/images/li.png',
-                          color: Colors.black,
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Text(
-                          'อุณหภูมิ',
+                        Text(
+                          ' C',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -144,20 +153,10 @@ class _CardHeatState extends State<CardHeat> {
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      width: 30,
-                    ),
-                    const Text(
-                      ' C',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),

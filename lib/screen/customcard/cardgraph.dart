@@ -34,26 +34,69 @@ class _CardGraphState extends State<CardGraph> {
       ),
       child: Column(
         children: [
-          const SizedBox(
-            height: 20,
-          ),
           SizedBox(
-            height: MediaQuery.of(context).size.height / 3.5,
+            height: MediaQuery.of(context).size.height / 1.9,
             width: MediaQuery.of(context).size.width / 1.6,
             child: Stack(
               children: [
                 PageView(
                   controller: _controller,
                   children: [
-                    const LineChart1(),
-                    ChartBar2(),
-                    ChartBar3(),
-                    ChartBar4(),
-                    ChartBar5(),
+                    Column(
+                      children: [
+                        const ChartBar1(),
+                        exportData('ความเข้มแสง'),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        ChartBar2(),
+                        exportData('อุณหภูมิ'),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        ChartBar3(),
+                        exportData('ความชื้นในอากาศ'),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        ChartBar4(),
+                        exportData('ความชื้นในดิน'),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        ChartBar5(),
+                        exportData('แอมโมเนีย'),
+                      ],
+                    ),
                   ],
                 ),
               ],
             ),
+          ),
+          // SizedBox(
+          //   height: MediaQuery.of(context).size.height / 3.7,
+          //   width: MediaQuery.of(context).size.width / 1.6,
+          //   child: Stack(
+          //     children: [
+          //       PageView(
+          //         controller: _controller,
+          //         children: [
+          //           exportData('ความเข้มแสง'),
+          //           exportData('อุณหภูมิ'),
+          //           exportData('ความชื้นในอากาศ'),
+          //           exportData('ความชื้นในดิน'),
+          //           exportData('แอมโมเนีย'),
+          //         ],
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          const SizedBox(
+            height: 10,
           ),
           SmoothPageIndicator(
             controller: _controller,
@@ -62,75 +105,85 @@ class _CardGraphState extends State<CardGraph> {
               dotHeight: 14,
             ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width / 1.6,
-            height: MediaQuery.of(context).size.height / 20,
-            decoration: const BoxDecoration(
-              color: Color(0xFF6FC0C5),
-              borderRadius: BorderRadius.all(
-                Radius.circular(14),
-              ),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'ข้อมูลย้อนหลัง',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    width: 30,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('วันเดือนปี '),
-              Icon(Icons.calendar_today_outlined),
-              Text(' - วันเดือนปี '),
-              Icon(Icons.calendar_today_outlined),
-            ],
-          ),
-          sizedBox,
-          bottom(context, kContainerSearchColor, 'ค้นหา'),
-          const SizedBox(
-            height: 25,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              bottom(context, kContainerPDFColor, 'PDF'),
-              bottom(context, kContainerExcelColor, 'Excel'),
-            ],
-          ),
         ],
       ),
     );
   }
 
+  exportData(String title) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              'ข้อมูลย้อนหลัง$title',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'วัน/เดือน/ปี - วัน/เดือน/ปี',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width / 1.6,
+          height: MediaQuery.of(context).size.height / 20,
+          decoration: const BoxDecoration(
+            color: Color(0xFF6FC0C5),
+            borderRadius: BorderRadius.all(
+              Radius.circular(14),
+            ),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_month,
+                      size: 25,
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        bottom(context, kContainerSearchColor, 'ค้นหา'),
+        const SizedBox(
+          height: 10,
+        ),
+        bottom(context, kContainerPDFColor, 'PDF'),
+        const SizedBox(
+          height: 10,
+        ),
+        bottom(context, kContainerExcelColor, 'Excel'),
+      ],
+    );
+  }
+
   Container bottom(BuildContext context, Color color, String text) {
     return Container(
-      width: MediaQuery.of(context).size.width / 5,
-      height: MediaQuery.of(context).size.height / 28,
+      width: MediaQuery.of(context).size.width / 1.6,
+      height: MediaQuery.of(context).size.height / 27,
       decoration: BoxDecoration(
         color: color,
         borderRadius: const BorderRadius.all(

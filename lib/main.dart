@@ -15,10 +15,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          textTheme: GoogleFonts.promptTextTheme(),
-          scaffoldBackgroundColor: kPrimaryColor),
+        textTheme: GoogleFonts.promptTextTheme(),
+        scaffoldBackgroundColor: kDefaultColor,
+      ),
       color: const Color(0xFF7EA48F),
       home: const Welcomescreen(),
+
     );
   }
 }
