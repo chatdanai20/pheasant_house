@@ -137,7 +137,9 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                                 initialItem: selectedItem),
                             onSelectedItemChanged: onChanged,
                             children: List<Widget>.generate(
-                                count, (int index) => Text('$index')),
+                              count,
+                              (int index) => Text('$index'),
+                            ),
                           ),
                         );
                       }
