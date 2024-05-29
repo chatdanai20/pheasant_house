@@ -2,14 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pheasant_house/constants.dart';
 
-class CardMoisture extends StatefulWidget {
-  const CardMoisture({super.key});
+class CardCleanRoof extends StatefulWidget {
+  const CardCleanRoof({super.key});
 
   @override
-  State<CardMoisture> createState() => _CardMoistureState();
+  State<CardCleanRoof> createState() => _CardCleanRoofState();
 }
 
-class _CardMoistureState extends State<CardMoisture> {
+class _CardCleanRoofState extends State<CardCleanRoof> {
   bool isOpen = false;
   bool isAuto = true;
   @override
@@ -31,7 +31,7 @@ class _CardMoistureState extends State<CardMoisture> {
           const SizedBox(
             height: 10,
           ),
-          Image.asset('asset/images/Vector.png'),
+          Image.asset('asset/images/spray.png'),
           sizedBox,
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

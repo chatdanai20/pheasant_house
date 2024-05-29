@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pheasant_house/constants.dart';
 
+import '../customcard/card-clean-roof.dart';
 import '../customcard/cardHeat.dart';
 import '../customcard/cardammonia.dart';
 import '../customcard/cardclean.dart';
-import '../customcard/cardgraph.dart';
 import '../customcard/cardmoisture.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class _MenuScreenState extends State<MenuScreen> {
     const CardHeat(),
     const CardAmmonia(),
     const CardMoisture(),
-    const CardGraph(),
+    const CardCleanRoof(),
     const CardClean(),
   ];
 
@@ -131,7 +131,7 @@ class _MenuScreenState extends State<MenuScreen> {
       case 2:
         return 'icon3';
       case 3:
-        return 'image4';
+        return 'snowing';
       case 4:
         return 'icon_clean';
       default:
