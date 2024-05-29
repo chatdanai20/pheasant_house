@@ -1,118 +1,312 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pheasant_house/screen/functionMQTT.dart/register_login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pheasant_house/screen/welcome/welcome.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreen();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreen extends State<RegisterScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+
+  final Future<FirebaseApp> firebase = Firebase.initializeApp();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController lastnameController = TextEditingController();
+  final TextEditingController genderController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+
   String groupValue = 'yes';
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-            size: 24,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+
+  UserProfile? registerUser() {
+    if (_formkey.currentState!.validate()) {
+      UserProfile newUser = UserProfile(
+        username: usernameController.text,
+        password: passwordController.text,
+        name: nameController.text,
+        lastname: lastnameController.text,
+        gender: genderController.text,
+        email: emailController.text,
+        phone: phoneController.text,
+        address: addressController.text,
+        role: groupValue,
+      );
+
+      // Add your registration logic here
+      // Print user details to the console
+      print('User Registered:');
+      print('Username: ${newUser.username}');
+      print('Password: ${newUser.password}');
+      print('Name: ${newUser.name}');
+      print('Lastname: ${newUser.lastname}');
+      print('Gender: ${newUser.gender}');
+      print('Email: ${newUser.email}');
+      print('Phone: ${newUser.phone}');
+      print('Address: ${newUser.address}');
+      print('Role: ${newUser.role}');
+
+      // Optionally, show a snackbar to indicate success
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text('User Registered: ${newUser.username}, ${newUser.email}'),
         ),
-        centerTitle: true,
-        title: const Text('ลงทะเบียน', style: TextStyle(color: Colors.white)),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                buildInputText('Username', 'Your Username'),
-                buildInputText('Password', 'Your Password'),
-                buildInputText('Name', 'Your Name'),
-                buildInputText('Lastname', 'Your Lastname'),
-                buildInputText('Gender', 'Your Gender'),
-                buildInputText('Email', 'Your Email'),
-                buildInputText('Phone', 'Your Phone'),
-                buildInputText('Address', 'Your Address'),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Row(
-                        children: [
-                          Radio(
-                              value: '1',
-                              groupValue: groupValue,
-                              onChanged: (value) {
-                                setState(() {
-                                  groupValue = value!;
-                                });
-                              }),
-                          Text(
-                            'เจ้าของฟาร์ม',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Radio(
-                              value: '2',
-                              groupValue: groupValue,
-                              onChanged: (value) {
-                                setState(() {
-                                  groupValue = value!;
-                                });
-                              }),
-                          Text(
-                            'ลูกจ้าง',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: double.infinity,
-                  height: 50,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFFFFF),
-                      elevation: 5,
-                    ),
-                    child: const Text(
-                      'ลงทะเบียน',
-                      style: TextStyle(color: Colors.black, fontSize: 20),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+      );
+
+      // Return newUser
+      return newUser;
+    } else {
+      // Return null if form validation fails
+      return null;
+    }
+    // Return null as default if the function completes without returning a value
   }
 
-  Widget buildInputText(String name, String nameHint) {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: firebase,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text("Error"),
+              ),
+              body: Center(
+                child: Text("${snapshot.error}"),
+              ),
+            );
+          }
+          if (snapshot.connectionState == ConnectionState.done) {
+            return Scaffold(
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                centerTitle: true,
+                title: const Text('ลงทะเบียน',
+                    style: TextStyle(color: Colors.white)),
+              ),
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  child: Center(
+                    child: Form(
+                      key: _formkey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          buildInputText(
+                              'Username', 'Your Username', usernameController),
+                          buildInputText(
+                              'Password', 'Your Password', passwordController),
+                          buildInputText('Name', 'Your Name', nameController),
+                          buildInputText(
+                              'Lastname', 'Your Lastname', lastnameController),
+                          buildInputText(
+                              'Gender', 'Your Gender', genderController),
+                          buildInputText(
+                              'Email', 'Your Email', emailController),
+                          buildInputText(
+                              'Phone', 'Your Phone', phoneController),
+                          buildInputText(
+                              'Address', 'Your Address', addressController),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 30),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Row(
+                                  children: [
+                                    Radio(
+                                        value: 'เจ้าของฟาร์ม',
+                                        groupValue: groupValue,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            groupValue = value!;
+                                          });
+                                        }),
+                                    Text(
+                                      'เจ้าของฟาร์ม',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.7),
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Radio(
+                                        value: 'ลูกจ้าง',
+                                        groupValue: groupValue,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            groupValue = value!;
+                                          });
+                                        }),
+                                    Text(
+                                      'ลูกจ้าง',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.7),
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            height: 50,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                registerUser();
+                                UserProfile? newUser = registerUser();
+                                if (_formkey.currentState!.validate()) {
+                                  try {
+                                    await FirebaseAuth.instance
+                                        .createUserWithEmailAndPassword(
+                                            email: newUser!.email,
+                                            password: newUser.password)
+                                        .then((value) async {
+                                      try {
+                                        await FirebaseFirestore.instance
+                                            .collection('User')
+                                            .doc(newUser.email)
+                                            .set({
+                                          'username': newUser.username,
+                                          'name': newUser.name,
+                                          'lastname': newUser.lastname,
+                                          'gender': newUser.gender,
+                                          'email': newUser.email,
+                                          'phone': newUser.phone,
+                                          'address': newUser.address,
+                                          'role': newUser.role,
+                                        });
+                                      } on FirebaseAuthException catch (e) {
+                                        Fluttertoast.showToast(
+                                          msg: e.message!,
+                                          toastLength: Toast.LENGTH_LONG,
+                                          gravity: ToastGravity.BOTTOM,
+                                        );
+                                      }
+
+                                      _formkey.currentState!.reset();
+                                      Navigator.pushReplacement(context,
+                                          MaterialPageRoute(builder: (context) {
+                                        return Welcomescreen();
+                                      }));
+                                    });
+                                  } on FirebaseAuthException catch (e) {
+                                    Fluttertoast.showToast(
+                                      msg: e.message!,
+                                      toastLength: Toast.LENGTH_LONG,
+                                      gravity: ToastGravity.BOTTOM,
+                                    );
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFFFFF),
+                                elevation: 5,
+                              ),
+                              child: const Text(
+                                'ลงทะเบียน',
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        });
+  }
+
+  Widget buildInputText(
+      String name, String nameHint, TextEditingController controller) {
+    // กำหนดค่าตั้งต้น
+    TextInputType keyboardType = TextInputType.text;
+    bool obscureText = false;
+    String? Function(String?)? validator;
+    // ตรวจสอบค่าของ name
+    if (name == 'Email') {
+      keyboardType = TextInputType.emailAddress;
+      validator = (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your email';
+        }
+        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+          return 'Please enter a valid email address';
+        }
+        return null;
+      };
+    } else if (name == 'Password') {
+      obscureText = true;
+      validator = (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your password';
+        }
+        if (value.length < 6) {
+          return 'Password must be at least 6 characters long';
+        }
+        if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^&\*])')
+            .hasMatch(value)) {
+          return 'Password must include at least one uppercase letter, one lowercase letter,one number,and one special character';
+        }
+        return null;
+      };
+    } else if (name == 'Phone') {
+      validator = (value) {
+        if (!RegExp(r'^(?=.*\d)').hasMatch(value!)) {
+          return 'Phone must include at number';
+        }
+        if (value.length < 10) {
+          return 'Phone must be at 10 characters';
+        }
+        return null;
+      };
+    } else {
+      validator = (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your $name';
+        }
+
+        return null;
+      };
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -133,7 +327,10 @@ class _RegisterScreen extends State<RegisterScreen> {
               color: const Color(0xFFD9D9D9).withOpacity(0.5),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: TextField(
+            child: TextFormField(
+              controller: controller,
+              keyboardType: keyboardType,
+              obscureText: obscureText,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: nameHint,
@@ -144,6 +341,7 @@ class _RegisterScreen extends State<RegisterScreen> {
                 fontSize: 16,
               ),
               cursorColor: Colors.white,
+              validator: validator,
             ),
           ),
         ),
@@ -151,3 +349,35 @@ class _RegisterScreen extends State<RegisterScreen> {
     );
   }
 }
+
+/*class RegisteredUserInfoScreen extends StatelessWidget {
+  final User user;
+
+  const RegisteredUserInfoScreen({Key? key, required this.user}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Registered User Info'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Username: ${user.username}'),
+            Text('Password: ${user.password}'),
+            Text('Name: ${user.name}'),
+            Text('Lastname: ${user.lastname}'),
+            Text('Gender: ${user.gender}'),
+            Text('Email: ${user.email}'),
+            Text('Phone: ${user.phone}'),
+            Text('Address: ${user.address}'),
+            Text('Role: ${user.role}'),
+          ],
+        ),
+      ),
+    );
+  }
+}*/

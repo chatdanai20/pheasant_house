@@ -351,7 +351,7 @@ class _CardHeatState extends State<CardHeat> {
   }
 }
 
-Widget buildInputText(String name, String nameHint) {
+Widget buildInputText(String name, String nameHint,) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [

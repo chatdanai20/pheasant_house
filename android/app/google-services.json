@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "730239248021",
+    "firebase_url": "https://smartpheasenthouse-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "smartpheasenthouse",
+    "storage_bucket": "smartpheasenthouse.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730239248021:android:b65009482c1e80ecee1d9c",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "730239248021-i73k02cv3qcpfnghhrd68rt8tqror2e6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuRTK8aSQNAF4kS4qBzXfGQ-KNwKWL_bs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "730239248021-i73k02cv3qcpfnghhrd68rt8tqror2e6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "730239248021-apo00mqgiubr8eo63gdgfvsvm3jjne9j.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pheasantHouse.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730239248021:android:80c08d33f415add7ee1d9c",
+        "android_client_info": {
+          "package_name": "com.example.pheasant_house"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "730239248021-i73k02cv3qcpfnghhrd68rt8tqror2e6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuRTK8aSQNAF4kS4qBzXfGQ-KNwKWL_bs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "730239248021-i73k02cv3qcpfnghhrd68rt8tqror2e6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "730239248021-apo00mqgiubr8eo63gdgfvsvm3jjne9j.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pheasantHouse.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
