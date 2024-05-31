@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pheasant_house/screen/chartscreen/chartscreen.dart';
 import 'package:pheasant_house/screen/menuscreen/menuscreen.dart';
+import 'package:pheasant_house/screen/homescreen/homescreen.dart';
 
 class MainScreen extends StatefulWidget {
   final String farmName;
@@ -30,7 +31,8 @@ class _MainScreenState extends State<MainScreen> {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       String email = user.email!;
-      DocumentSnapshot<Map<String, dynamic>> farmData = await FirebaseFirestore.instance
+      DocumentSnapshot<Map<String, dynamic>> farmData = await FirebaseFirestore
+          .instance
           .collection('User')
           .doc(email)
           .collection('farm')
@@ -52,6 +54,7 @@ class _MainScreenState extends State<MainScreen> {
       _selectedTitle = title;
       displayText = value;
       _selectedImage = image;
+       
     });
   }
 
@@ -64,7 +67,8 @@ class _MainScreenState extends State<MainScreen> {
             : Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                    padding:
+                        const EdgeInsets.only(top: 10, left: 10, right: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -72,7 +76,12 @@ class _MainScreenState extends State<MainScreen> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const HomeScreen(),
+                                  ),
+                                );
                               },
                               icon: const Icon(Icons.arrow_back),
                             ),
@@ -130,7 +139,8 @@ class _MainScreenState extends State<MainScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -179,7 +189,8 @@ class _MainScreenState extends State<MainScreen> {
                                         height: 130,
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(20),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
                                             image: DecorationImage(
                                               image: AssetImage(_selectedImage),
                                               fit: BoxFit.contain,
@@ -193,7 +204,8 @@ class _MainScreenState extends State<MainScreen> {
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.only(
-                                              bottom: 10), // Increase the bottom padding as needed
+                                              bottom:
+                                                  10), // Increase the bottom padding as needed
                                           child: Text(
                                             displayText,
                                             style: const TextStyle(
@@ -203,7 +215,7 @@ class _MainScreenState extends State<MainScreen> {
                                           ),
                                         ),
                                         Text(
-                                         'ข้อมูลล่าสุดเมื่อ ${houseData?['time'] ?? 'N/A'}',
+                                          'ข้อมูลล่าสุดเมื่อ ${houseData?['time'] ?? 'N/A'}',
                                           style: const TextStyle(
                                             fontSize: 24,
                                             fontWeight: FontWeight.bold,
@@ -262,9 +274,11 @@ class _MainScreenState extends State<MainScreen> {
                                     'ความดันอากาศ: ${houseData?['air_pressure'] ?? 'N/A'}',
                                     'asset/images/pressure.png'),
                                 const SizedBox(width: 10),
-                                _infoCardGraph('ข้อมูลย้อนหลัง', Icons.history, context),
+                                _infoCardGraph(
+                                    'ข้อมูลย้อนหลัง', Icons.history, context),
                                 const SizedBox(width: 10),
-                                _infoCardWithNavigation('เมนูเพิ่มเติม', Icons.menu, context),
+                                _infoCardWithNavigation(
+                                    'เมนูเพิ่มเติม', Icons.menu, context),
                                 const SizedBox(width: 10),
                               ],
                             ),
@@ -305,7 +319,8 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _infoCardWithNavigation(String title, IconData icon, BuildContext context) {
+  Widget _infoCardWithNavigation(
+      String title, IconData icon, BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
