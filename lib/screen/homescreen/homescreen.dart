@@ -210,19 +210,55 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _searchHouse() {
+  Future<void> _searchHouse() async {
     String email = _emailController.text.trim();
     String houseName = _houseNameController.text.trim();
+
     if (email.isNotEmpty && houseName.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ViewerScreen(
-            userEmail: email,
-            houseName: houseName,
+      var userDoc = await FirebaseFirestore.instance.collection('User').doc(email).get();
+      if (userDoc.exists) {
+        var houseDoc = await FirebaseFirestore.instance
+            .collection('User')
+            .doc(email)
+            .collection('farm')
+            .doc(houseName)
+            .get();
+        if (houseDoc.exists) {
+          var environmentDoc = await houseDoc.reference
+              .collection('environment')
+              .doc('now')
+              .get();
+          if (environmentDoc.exists) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ViewerScreen(
+                  userEmail: email,
+                  houseName: houseName,
+                ),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('No environment data available for this house'),
+              ),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No house found with the given name'),
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No user found with the given email'),
           ),
-        ),
-      );
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -333,38 +369,37 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-void _checkEnvironment(String houseName) async {
-  var farmRef = FirebaseFirestore.instance
-      .collection('User')
-      .doc(_userEmail)
-      .collection('farm')
-      .doc(houseName);
-  
-  var environmentCollection = farmRef.collection('environment');
 
-  var environmentSnapshot = await environmentCollection.get();
+  void _checkEnvironment(String houseName) async {
+    var farmRef = FirebaseFirestore.instance
+        .collection('User')
+        .doc(_userEmail)
+        .collection('farm')
+        .doc(houseName);
 
-  if (environmentSnapshot.docs.isNotEmpty) {
-    // มี collection "environment" ภายในโรงเรือนที่เลือก
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MainScreen(farmName: houseName),
-      ),
-    );
-  } else {
-     Navigator.pop(context);
-    // ไม่มี collection "environment" ภายในโรงเรือนที่เลือก
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('No environment data available for $houseName'),
-        
-      ),
-      
-    );
-     
+    var environmentCollection = farmRef.collection('environment');
+
+    var environmentSnapshot = await environmentCollection.get();
+
+    if (environmentSnapshot.docs.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MainScreen(farmName: houseName),
+        ),
+      );
+    } else {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No environment data available for $houseName'),
+        ),
+      );
+    }
   }
-}
+
+
+
   void _deleteHouse(String houseName) async {
     await FirebaseFirestore.instance
         .collection('User')
