@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pheasant_house/screen/mainscreen/mainscreen.dart';
 import 'package:pheasant_house/screen/profileScreen/profilescreen.dart';
 import 'package:pheasant_house/screen/viewerscreen/viewerscreen.dart';
+import 'package:pheasant_house/screen/notification/notificationscreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -74,8 +75,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         onSelected: (String value) {
                           switch (value) {
                             case 'notification':
-                              print('Notification tapped');
-                              break;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      NotificationScreen(userEmail: _userEmail),
+                                ),
+                              );
+                               break;
                             case 'information':
                               Navigator.push(
                                 context,
@@ -181,13 +188,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           documents[index].data() as Map<String, dynamic>;
                       final String houseName = data['farm_name'] ?? '';
                       return CustomCard(
-                        text: houseName,                        
+                        text: houseName,
                         onTap: () {
                           _checkEnvironment(houseName);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MainScreen(farmName:  houseName), 
+                              builder: (context) =>
+                                  MainScreen(farmName: houseName),
                             ),
                           );
                         },
@@ -215,7 +223,8 @@ class _HomeScreenState extends State<HomeScreen> {
     String houseName = _houseNameController.text.trim();
 
     if (email.isNotEmpty && houseName.isNotEmpty) {
-      var userDoc = await FirebaseFirestore.instance.collection('User').doc(email).get();
+      var userDoc =
+          await FirebaseFirestore.instance.collection('User').doc(email).get();
       if (userDoc.exists) {
         var houseDoc = await FirebaseFirestore.instance
             .collection('User')
@@ -301,6 +310,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () async {
               String houseName = _houseNameController.text;
@@ -397,8 +412,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
   }
-
-
 
   void _deleteHouse(String houseName) async {
     await FirebaseFirestore.instance

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pheasant_house/constants.dart';
+import 'package:pheasant_house/screen/functionMQTT.dart/mqtt.dart';
+import 'package:mqtt_client/mqtt_client.dart';
 
 class CardMoisture extends StatefulWidget {
   const CardMoisture({super.key});
@@ -10,8 +12,76 @@ class CardMoisture extends StatefulWidget {
 }
 
 class _CardMoistureState extends State<CardMoisture> {
+  final MqttHandler mqttHandler = MqttHandler();
   bool isOpen = false;
-  bool isAuto = true;
+  bool isAuto = false;
+  bool isAutoMode = false;
+  int selectedOpenHour = 0;
+  int selectedOpenMinute = 0;
+  int selectedCloseHour = 0;
+  int selectedCloseMinute = 0;
+  String openingTimeMessage = '';
+  String closingTimeMessage = '';
+  TextEditingController sensorOpenController = TextEditingController();
+  TextEditingController sensorCloseController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Subscribe to the LDR stream to get real-time updates
+    mqttHandler.soilStream.listen((double soilValue) {
+      setState(() {
+        soilValue = soilValue;
+      });
+    });
+  }
+
+  void switchToManualMode() {
+    setState(() {
+      isAutoMode = false;
+    });
+
+    // Check if MQTT client is connected before sending the command
+    if (mqttHandler.client.connectionStatus!.state ==
+        MqttConnectionState.connected) {
+      mqttHandler.sendAutoModeCommand('esp32/auto_mode', 'manual');
+    }
+  }
+
+  void switchToAutoMode() {
+    setState(() {
+      isAutoMode = true;
+    });
+
+    // Check if MQTT client is connected before sending the command
+    if (mqttHandler.client.connectionStatus!.state ==
+        MqttConnectionState.connected) {
+      mqttHandler.sendAutoModeCommand('esp32/auto_mode', 'auto');
+    }
+  }
+
+  void turnOnRelay3() {
+    if (mqttHandler.client.connectionStatus!.state ==
+        MqttConnectionState.connected) {
+      mqttHandler.controlRelay('esp32/relay3', 'on');
+    }
+  }
+
+  void turnOffRelay3() {
+    if (mqttHandler.client.connectionStatus!.state ==
+        MqttConnectionState.connected) {
+      mqttHandler.controlRelay('esp32/relay3', 'off');
+    }
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the MqttHandler when the widget is disposed
+    mqttHandler.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -74,6 +144,11 @@ class _CardMoistureState extends State<CardMoisture> {
                   setState(
                     () {
                       isOpen = value;
+                      if (isOpen) {
+                        turnOnRelay3();
+                      } else {
+                        turnOffRelay3();
+                      }
                     },
                   );
                 },
@@ -100,6 +175,11 @@ class _CardMoistureState extends State<CardMoisture> {
                   setState(
                     () {
                       isAuto = value;
+                      if (isAuto) {
+                        switchToAutoMode();
+                      } else {
+                        switchToManualMode();
+                      }
                     },
                   );
                 },
@@ -123,11 +203,6 @@ class _CardMoistureState extends State<CardMoisture> {
                 builder: (BuildContext context) {
                   return StatefulBuilder(
                     builder: (BuildContext context, StateSetter setState) {
-                      int selectedOpenHour = 0;
-                      int selectedOpenMinute = 0;
-                      int selectedCloseHour = 0;
-                      int selectedCloseMinute = 0;
-
                       Widget buildPicker(int count, int selectedItem,
                           ValueChanged<int> onChanged) {
                         return Expanded(
@@ -175,16 +250,38 @@ class _CardMoistureState extends State<CardMoisture> {
                                         style: TextStyle(color: Colors.white),
                                       ),
                                       onPressed: () {
-                                        Navigator.pop(context);
+                                        setState(() {
+                                          openingTimeMessage =
+                                              '${selectedOpenHour}:${selectedOpenMinute}';
+                                          closingTimeMessage =
+                                              '${selectedCloseHour}:${selectedCloseMinute}';
+                                        });
+                                        mqttHandler.sendSensorValue(
+                                            'esp32/sensoropen',
+                                            sensorOpenController.text);
+                                        mqttHandler.sendSensorValue(
+                                            'esp32/sensorclose',
+                                            sensorCloseController.text);
+                                        mqttHandler.sendAutoModeCommand(
+                                            'esp32/motor1on',
+                                            openingTimeMessage);
+                                        mqttHandler.sendAutoModeCommand(
+                                            'esp32/motor1off',
+                                            closingTimeMessage);
                                         print(
-                                            "Hour: $selectedOpenHour, Minute: $selectedOpenMinute");
+                                            'Opening Time: $openingTimeMessage');
+                                        print(
+                                            'Closing Time: $closingTimeMessage');
+                                        Navigator.pop(context);
                                       },
                                     ),
                                   ],
                                 ),
                               ),
-                              buildInputText('ค่าเซนเซอร์เปิด ', 'อุณหภูมิ'),
-                              buildInputText('ค่าเซนเซอร์ปิด ', 'อุณหภูมิ'),
+                              buildInputText('ค่าเซนเซอร์เปิด ', 'อุณหภูมิ',
+                                  sensorOpenController),
+                              buildInputText('ค่าเซนเซอร์ปิด ', 'อุณหภูมิ',
+                                  sensorCloseController),
                               const SizedBox(
                                 height: 10,
                               ),
@@ -312,7 +409,7 @@ class _CardMoistureState extends State<CardMoisture> {
                 ),
               ),
               Text(
-                '08 : 00 น.',
+                'sus',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -327,16 +424,18 @@ class _CardMoistureState extends State<CardMoisture> {
           const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Text widget for displaying the label "เวลาเปิด"
               Text(
-                'เวลาเปิด ',
+                'เวลาปิด ',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              // Text widget for displaying the opening time
               Text(
-                '19 : 00 น.',
+                'sus',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -354,6 +453,7 @@ class _CardMoistureState extends State<CardMoisture> {
 Widget buildInputText(
   String name,
   String nameHint,
+  TextEditingController controller,
 ) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,6 +475,7 @@ Widget buildInputText(
             borderRadius: BorderRadius.circular(20),
           ),
           child: TextField(
+            controller: controller,
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: nameHint,

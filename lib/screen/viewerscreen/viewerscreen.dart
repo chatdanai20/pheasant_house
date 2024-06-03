@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pheasant_house/screen/homescreen/homescreen.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class ViewerScreen extends StatefulWidget {
   final String userEmail;
@@ -19,11 +21,12 @@ class _ViewerScreenState extends State<ViewerScreen> {
   String _selectedTitle = 'ความเข้มแสง';
   String _selectedImage = 'asset/images/sun.png';
   Map<String, dynamic>? houseData;
+  Map<String, dynamic>? userData;
 
   @override
   void initState() {
     super.initState();
-    fetchHouseData();
+    initializeDateFormatting('th', null).then((_) => fetchHouseData());
   }
 
   Future<void> fetchHouseData() async {
@@ -37,10 +40,15 @@ class _ViewerScreenState extends State<ViewerScreen> {
           .collection('environment')
           .doc('now')
           .get();
-
-      if (farmData.exists) {
+      DocumentSnapshot<Map<String, dynamic>> userDataSnapshot = await FirebaseFirestore
+          .instance
+          .collection('User')
+          .doc(widget.userEmail)
+          .get();
+      if (farmData.exists && userDataSnapshot.exists) {
         setState(() {
           houseData = farmData.data();
+          userData = userDataSnapshot.data();
         });
       }
     }
@@ -54,11 +62,15 @@ class _ViewerScreenState extends State<ViewerScreen> {
     });
   }
 
+  String getThaiFormattedDate(DateTime date) {
+    return DateFormat.yMMMMEEEEd('th').format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: houseData == null
+        child: houseData == null || userData == null
             ? Center(child: CircularProgressIndicator())
             : Column(
                 children: [
@@ -91,19 +103,19 @@ class _ViewerScreenState extends State<ViewerScreen> {
                             const SizedBox(
                               width: 10,
                             ),
-                            const Column(
+                            Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Welcome',
+                                const Text(
+                                  'ข้อมูลโรงเรือน',
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  'To Pheasant House',
-                                  style: TextStyle(
+                                  'คุณ ${userData?['name'] ?? 'N/A'} ${userData?['lastname'] ?? 'N/A'}',
+                                  style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
@@ -149,7 +161,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 5),
                                 child: Text(
-                                  'วันนี้, ${DateTime.now().toLocal().toString().split(' ')[0]}',
+                                  'วันนี้, ${getThaiFormattedDate(DateTime.now())}',
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -242,7 +254,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                                     'ความชื้นดิน',
                                     Icons.opacity,
                                     'ความชื้นดิน: ${houseData?['soilmoisture'] ?? 'N/A'} %',
-                                    'asset/images/humidity.png'),
+                                    'asset/images/soil.png'),
                                 const SizedBox(width: 10),
                                 _infoCard(
                                     'ความชื้นอากาศ',
