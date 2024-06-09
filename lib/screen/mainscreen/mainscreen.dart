@@ -7,6 +7,7 @@ import 'package:pheasant_house/screen/homescreen/homescreen.dart';
 import 'package:pheasant_house/screen/profileScreen/profilescreen.dart'; // Import the profile screen
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:pheasant_house/screen/notification/notificationscreen.dart';
 
 class MainScreen extends StatefulWidget {
   final String farmName;
@@ -18,6 +19,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  late User? _user;
+  late String _userEmail = '';
   String displayText = 'เลือกข้อมูลที่ต้องการดู';
   final IconData _selectedIcon = Icons.wb_sunny;
   String _selectedTitle = 'ความเข้มแสง';
@@ -27,6 +30,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    _user = FirebaseAuth.instance.currentUser;
+    _userEmail = _user?.email ?? '';
     initializeDateFormatting('th', null).then((_) => fetchHouseData());
   }
 
@@ -303,7 +308,13 @@ class _MainScreenState extends State<MainScreen> {
                       onSelected: (String value) {
                         switch (value) {
                           case 'notification':
-                            print('Notification tapped');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    NotificationScreen(userEmail: _userEmail),
+                              ),
+                            );
                             break;
                           case 'information':
                             Navigator.push(
@@ -392,7 +403,11 @@ class _MainScreenState extends State<MainScreen> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const MenuScreen()),
+          MaterialPageRoute(
+            builder: (context) => MenuScreen(
+                farmName:
+                    widget.farmName), // ส่งชื่อโรงเรือนผ่านพารามิเตอร์ farmName
+          ),
         );
       },
       child: Container(

@@ -22,7 +22,7 @@ Future<void> creatNewPheasantHouse(String pheasant_house_name) async {
   });
 
   CollectionReference subcollection_1 = farm_id.collection('cleaning_day');
-  DocumentReference cleaning_id = subcollection_1.doc('cleaningday_id:1');
+  DocumentReference cleaning_id = subcollection_1.doc('cleaningday_id');
   await cleaning_id.set({
     'cleaning_day': DateTime.now(),
     'cleaning_id': "1",

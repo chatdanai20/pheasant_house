@@ -1,28 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:pheasant_house/constants.dart';
+import 'package:pheasant_house/screen/customcard/cardclean.dart';
 
 import '../customcard/card-clean-roof.dart';
 import '../customcard/cardHeat.dart';
 import '../customcard/cardammonia.dart';
-import '../customcard/cardclean.dart';
 import '../customcard/cardmoisture.dart';
+import 'package:pheasant_house/screen/customcard/cardnotiammonia.dart';
+import 'package:pheasant_house/screen/customcard/cardnotitemp.dart';
 
 class MenuScreen extends StatefulWidget {
-  const MenuScreen({super.key});
+  final String farmName; // เพิ่มพารามิเตอร์ farmName ในคอนสตรักเตอร์
+
+  const MenuScreen({Key? key, required this.farmName}) : super(key: key);
 
   @override
-  State<MenuScreen> createState() => _MenuScreenState();
+  _MenuScreenState createState() => _MenuScreenState();
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  List<bool> isSelected = [true, false, false, false, false];
-  List<Widget> cards = [
-    const CardHeat(),
-    const CardAmmonia(),
-    const CardMoisture(),
-    const CardCleanRoof(),
-    const CardClean(),
-  ];
+  late List<bool> isSelected;
+  late List<Widget> cards;
+
+  @override
+  void initState() {
+    super.initState();
+    isSelected = [true, false, false, false, false,false,false];
+    cards = [
+      const CardHeat(),
+      const CardAmmonia(),
+      const CardMoisture(),
+      const CardCleanRoof(),
+      CardClean(farmName: widget.farmName), // สร้าง CardClean ใน initState()
+      CardNotificationTemp(farmName: widget.farmName),
+      CardNotificationAmmonia(farmName: widget.farmName),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +67,7 @@ class _MenuScreenState extends State<MenuScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: Image.asset(
-                            'asset/images/Logo.png',
+                            'asset/images/Logo2.png',
                           ),
                         ),
                       ),
@@ -65,21 +78,21 @@ class _MenuScreenState extends State<MenuScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome',
+                            'Control And Setting',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(
-                            'To Pheasant House',
+                          /*Text(
+                            '',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
-                          ),
+                          ),*/
                         ],
                       ),
                     ],
@@ -103,17 +116,24 @@ class _MenuScreenState extends State<MenuScreen> {
                 const SizedBox(
                   height: kDefaultPadding * 0.8,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    for (int i = 0; i < isSelected.length; i++)
-                      bottomAction(i, '${getImageName(i)}.png'),
-                  ],
+                 SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      for (int i = 0; i < isSelected.length; i++)
+                        bottomAction(i, '${getImageName(i)}.png'),
+                    ],
+                  ),
                 ),
                 const SizedBox(
                   height: kDefaultPadding * 0.8,
                 ),
-                cards[getSelectedIndex()],
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: cards[getSelectedIndex()],
+                  ),
+                ),
               ],
             ),
           ),
@@ -134,6 +154,10 @@ class _MenuScreenState extends State<MenuScreen> {
         return 'snowing';
       case 4:
         return 'icon_clean';
+      case 5:
+        return 'icontemp';
+      case 6:
+        return 'NH3';
       default:
         return '';
     }
@@ -170,6 +194,8 @@ class _MenuScreenState extends State<MenuScreen> {
             width: 30,
             height: 30,
             color: Colors.black,
+             // เพิ่มการปรับขนาดรูปในไอคอนสำหรับการ์ดที่ 5 และ 6
+            scale: (index == 5 || index == 6) ? 1.0 : 1.0,
           ),
         ),
       ),

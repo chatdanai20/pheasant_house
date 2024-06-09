@@ -54,14 +54,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             'Welcome',
                             style: TextStyle(
-                                color: Colors.black,
+                                color: Colors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold),
                           ),
                           Text(
                             'To Pheasant House',
                             style: TextStyle(
-                                color: Colors.black,
+                                color: Colors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold),
                           ),
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       NotificationScreen(userEmail: _userEmail),
                                 ),
                               );
-                               break;
+                              break;
                             case 'information':
                               Navigator.push(
                                 context,
@@ -343,9 +343,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     'farm_name': houseName,
                     'mqtt_server': mqttServer,
                     'mqtt_client': mqttClient,
-                    'temperature': 25,
-                    'humidity': 50,
-                    'status': 'active',
                   });
                   Navigator.pop(context);
                 }

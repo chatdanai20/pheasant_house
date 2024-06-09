@@ -5,81 +5,65 @@ import 'package:numberpicker/numberpicker.dart';
 import 'package:intl/intl.dart'; // เพิ่มเพื่อใช้สำหรับการแสดงวันที่
 import '../../constants.dart';
 
-class CardClean extends StatefulWidget {
+class CardNotificationTemp extends StatefulWidget {
   final String farmName;
 
-  const CardClean({Key? key, required this.farmName}) : super(key: key);
+  const CardNotificationTemp({Key? key, required this.farmName})
+      : super(key: key);
   @override
-  State<CardClean> createState() => _CardCleanState();
+  State<CardNotificationTemp> createState() => _CardNotificationTempState();
 }
 
-class _CardCleanState extends State<CardClean> {
-  final TextEditingController _intervalController = TextEditingController();
+class _CardNotificationTempState extends State<CardNotificationTemp> {
+  final TextEditingController _notification_max = TextEditingController();
+  final TextEditingController _notification_min = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  int _selectedDay = DateTime.now().day;
-  int _selectedMonth = DateTime.now().month;
-  int _selectedYear = DateTime.now().year + 543;
-
   @override
   void dispose() {
-    _intervalController.dispose();
+    _notification_max.dispose();
+    _notification_min.dispose();
     super.dispose();
   }
 
-  Future<void> _saveCleaningDay() async {
-    int day = _selectedDay;
-    int month = _selectedMonth;
-    int year = _selectedYear - 543; // Convert to AD
-
-    DateTime selectedDate = DateTime(year, month, day);
-
-    if (selectedDate.isBefore(DateTime.now())) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('โปรดเลือกวันที่ในอนาคต'),
-      ));
-      return;
-    }
-
-    int intervalDays = int.parse(_intervalController.text);
+  Future<void> _saveNotification() async {
+    int notification_max = int.parse(_notification_max.text);
+    int notification_min = int.parse(_notification_min.text);
 
     User? user = _auth.currentUser;
     if (user != null) {
       String email = user.email!;
       String farmName =
           widget.farmName; // ใช้ widget.farmName ที่ส่งเข้ามาใน constructor
-      String cleaningDayId =
-          'cleaningday'; // สมมุติว่าใช้ id 1 สำหรับ cleaning_day
 
       await _firestore
           .collection('User')
           .doc(email)
           .collection('farm')
           .doc(farmName)
-          .collection('cleaning_day')
-          .doc(cleaningDayId)
+          .collection('notification')
+          .doc('temperature')
           .set({
-        'cleaning_day': selectedDate,
-        'intervalDays': intervalDays,
+        'notification_max': notification_max,
+        'notification_min': notification_min,
       });
     }
   }
 
-  Future<Map<String, dynamic>?> _getCleaningDayData() async {
+  Future<Map<String, dynamic>?> _getNotification() async {
     User? user = _auth.currentUser;
     if (user != null) {
       String email = user.email!;
       String farmName = widget.farmName;
-      String cleaningDayId = 'cleaningday';
 
       DocumentSnapshot<Map<String, dynamic>> doc = await _firestore
           .collection('User')
           .doc(email)
           .collection('farm')
           .doc(farmName)
-          .collection('cleaning_day')
-          .doc(cleaningDayId)
+          .collection('notification')
+          .doc('temperature')
           .get();
 
       if (doc.exists) {
@@ -97,8 +81,8 @@ class _CardCleanState extends State<CardClean> {
           .doc(FirebaseAuth.instance.currentUser?.email)
           .collection('farm')
           .doc(widget.farmName)
-          .collection('cleaning_day')
-          .doc('cleaningday')
+          .collection('notification')
+          .doc('temperature')
           .snapshots(),
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -113,10 +97,8 @@ class _CardCleanState extends State<CardClean> {
           return Text('ไม่มีข้อมูล');
         }
 
-        DateTime cleaningDay = snapshot.data!['cleaning_day'].toDate();
-        int intervalDays = snapshot.data!['intervalDays'];
-
-        String formattedDate = DateFormat.yMMMMd('th_TH').format(cleaningDay);
+        int notification_max = snapshot.data!['notification_max'];
+        int notification_min = snapshot.data!['notification_min'];
 
         return Container(
           width: MediaQuery.of(context).size.width / 1.3,
@@ -133,7 +115,7 @@ class _CardCleanState extends State<CardClean> {
           child: Column(
             children: [
               sizedBox,
-              Image.asset('asset/images/carbon_clean.png'),
+              Image.asset('asset/images/temperature.png'),
               const SizedBox(
                 height: 50,
               ),
@@ -143,7 +125,7 @@ class _CardCleanState extends State<CardClean> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(left: 30, bottom: 5),
-                    child: Text('วันทำความสะอาด',
+                    child: Text('ค่าอุณหภูมิสูงสุด',
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold)),
                   ),
@@ -167,7 +149,7 @@ class _CardCleanState extends State<CardClean> {
                       Expanded(
                         // เพิ่ม Expanded รอบ Text
                         child: Text(
-                          formattedDate,
+                          '${notification_max}',
                           textAlign:
                               TextAlign.center, // ปรับให้ข้อความอยู่ตรงกลาง
                           style: const TextStyle(
@@ -176,9 +158,12 @@ class _CardCleanState extends State<CardClean> {
                           ),
                         ),
                       ),
-                      const Icon(
-                        Icons.calendar_today,
-                        color: Colors.black,
+                      Text(
+                        '°C',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -190,7 +175,7 @@ class _CardCleanState extends State<CardClean> {
                   const Padding(
                     padding: EdgeInsets.only(left: 30, bottom: 5),
                     child: Text(
-                      'ช่วงวัน',
+                      'ค่าอุณหภูมิต่ำสุด',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
@@ -215,7 +200,7 @@ class _CardCleanState extends State<CardClean> {
                       Expanded(
                         // เพิ่ม Expanded รอบ Text
                         child: Text(
-                          '$intervalDays ',
+                          '${notification_min} ',
                           textAlign:
                               TextAlign.center, // ปรับให้ข้อความอยู่ตรงกลาง
                           style: const TextStyle(
@@ -225,7 +210,7 @@ class _CardCleanState extends State<CardClean> {
                         ),
                       ),
                       Text(
-                        'วัน',
+                        '°C',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -252,71 +237,27 @@ class _CardCleanState extends State<CardClean> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const Text(
-                                    "ตั้งค่าทำความสะอาด",
+                                    "ตั้งค่าเเจ้งเตือนอุณหภูมิ",
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   const SizedBox(height: 20),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: <Widget>[
-                                      Column(
-                                        children: [
-                                          const Text('วัน'),
-                                          buildNumberPicker(
-                                            _selectedDay,
-                                            1,
-                                            31,
-                                            (value) {
-                                              setState(() {
-                                                _selectedDay = value;
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        children: [
-                                          const Text('เดือน'),
-                                          buildNumberPicker(
-                                            _selectedMonth,
-                                            1,
-                                            12,
-                                            (value) {
-                                              setState(() {
-                                                _selectedMonth = value;
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        children: [
-                                          const Text('ปี (พ.ศ.)'),
-                                          buildNumberPicker(
-                                            _selectedYear,
-                                            DateTime.now().year + 543,
-                                            DateTime.now().year + 543 + 100,
-                                            (value) {
-                                              setState(() {
-                                                _selectedYear = value;
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                  TextFormField(
+                                    decoration: const InputDecoration(
+                                      labelText: "ตั้งค่าอุณหภูมิสูงสุด",
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    controller: _notification_min,
                                   ),
                                   const SizedBox(height: 20),
                                   TextFormField(
                                     decoration: const InputDecoration(
-                                      labelText: "ช่วงวัน (interval)",
+                                      labelText: "ตั้งค่าอุณหภูมิต่ำสุด",
                                     ),
                                     keyboardType: TextInputType.number,
-                                    controller: _intervalController,
+                                    controller: _notification_min,
                                   ),
                                   const SizedBox(height: 20),
                                   Row(
@@ -324,7 +265,7 @@ class _CardCleanState extends State<CardClean> {
                                     children: [
                                       ElevatedButton(
                                         onPressed: () {
-                                          _saveCleaningDay();
+                                          _saveNotification();
                                           Navigator.of(context).pop();
                                         },
                                         style: ElevatedButton.styleFrom(
@@ -369,7 +310,7 @@ class _CardCleanState extends State<CardClean> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'ตั้งค่าทำความสะอาด',
+                      'ตั้งค่าเเจ้งเตือนอุณหภูมิ',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
