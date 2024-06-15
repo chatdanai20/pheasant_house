@@ -30,9 +30,9 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
     super.initState();
 
     // Subscribe to the LDR stream to get real-time updates
-    mqttHandler.ldrStream.listen((double ldrValue) {
+    mqttHandler.temperatureStream.listen((double tempValue) {
       setState(() {
-        ldrValue = ldrValue;
+        tempValue = tempValue;
       });
     });
   }
@@ -257,10 +257,10 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                                               '${selectedCloseHour}:${selectedCloseMinute}';
                                         });
                                         mqttHandler.sendSensorValue(
-                                            'esp32/sensoropen',
+                                            'esp32/mintemp',
                                             sensorOpenController.text);
                                         mqttHandler.sendSensorValue(
-                                            'esp32/sensorclose',
+                                            'esp32/maxtemp',
                                             sensorCloseController.text);
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/motor2on',
@@ -268,10 +268,7 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/motor2off',
                                             closingTimeMessage);
-                                        print(
-                                            'Opening Time: $openingTimeMessage');
-                                        print(
-                                            'Closing Time: $closingTimeMessage');
+                                        // print(tempValue);
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -409,7 +406,7 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                 ),
               ),
               Text(
-                'sus',
+                '',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -435,7 +432,7 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
               ),
               // Text widget for displaying the opening time
               Text(
-                'sus',
+                '',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,

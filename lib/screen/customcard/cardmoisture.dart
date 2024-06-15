@@ -257,10 +257,10 @@ class _CardMoistureState extends State<CardMoisture> {
                                               '${selectedCloseHour}:${selectedCloseMinute}';
                                         });
                                         mqttHandler.sendSensorValue(
-                                            'esp32/sensoropen',
+                                            'esp32/minsoil',
                                             sensorOpenController.text);
                                         mqttHandler.sendSensorValue(
-                                            'esp32/sensorclose',
+                                            'esp32/maxsoil',
                                             sensorCloseController.text);
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/motor1on',
@@ -268,10 +268,7 @@ class _CardMoistureState extends State<CardMoisture> {
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/motor1off',
                                             closingTimeMessage);
-                                        print(
-                                            'Opening Time: $openingTimeMessage');
-                                        print(
-                                            'Closing Time: $closingTimeMessage');
+
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -361,7 +358,7 @@ class _CardMoistureState extends State<CardMoisture> {
                 ),
               ),
               Text(
-                ' 40 °C',
+                ' 405 °C',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -409,7 +406,7 @@ class _CardMoistureState extends State<CardMoisture> {
                 ),
               ),
               Text(
-                'sus',
+                '',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -435,7 +432,7 @@ class _CardMoistureState extends State<CardMoisture> {
               ),
               // Text widget for displaying the opening time
               Text(
-                'sus',
+                '',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,

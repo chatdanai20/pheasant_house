@@ -83,10 +83,56 @@ class _CardCleanState extends State<CardClean> {
           .get();
 
       if (doc.exists) {
-        return doc.data();
+        Map<String, dynamic>? data = doc.data();
+        if (data != null && data.containsKey('intervalDays')) {
+          return data;
+        } else {
+          // Handle case where intervalDays is not present or null
+          return {'cleaning_day': doc['cleaning_day']};
+        }
       }
     }
     return null;
+  }
+  Future<void> _updateCleaningDate() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      String email = user.email!;
+      String farmName = widget.farmName;
+      String cleaningDayId = 'cleaningday';
+
+      // Get current data from Firestore
+      DocumentSnapshot<Map<String, dynamic>> doc = await _firestore
+          .collection('User')
+          .doc(email)
+          .collection('farm')
+          .doc(farmName)
+          .collection('cleaning_day')
+          .doc(cleaningDayId)
+          .get();
+
+      if (doc.exists) {
+        // Calculate new cleaning day
+        // DateTime currentCleaningDay = doc['cleaning_day'].toDate();
+        int intervalDays = doc['intervalDays'];
+        DateTime newCleaningDay = DateTime.now().add(Duration(days: intervalDays));
+        // DateTime newCleaningDay =
+        //     currentCleaningDay.add(Duration(days: intervalDays));
+
+        // Update Firestore with new data
+        await _firestore
+            .collection('User')
+            .doc(email)
+            .collection('farm')
+            .doc(farmName)
+            .collection('cleaning_day')
+            .doc(cleaningDayId)
+            .set({
+          'cleaning_day': newCleaningDay,
+          'intervalDays': intervalDays,
+        });
+      }
+    }
   }
 
   @override
@@ -382,6 +428,26 @@ class _CardCleanState extends State<CardClean> {
                     ),
                   ],
                 ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      _updateCleaningDate();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6FC0C5),
+                    ),
+                    child: const Text(
+                      "ทำความสะอาดแล้ว",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

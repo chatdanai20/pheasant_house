@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pheasant_house/constants.dart';
@@ -13,6 +15,7 @@ class CardAmmonia extends StatefulWidget {
 
 class _CardAmmoniaState extends State<CardAmmonia> {
   final MqttHandler mqttHandler = MqttHandler();
+  // late int temp;
   bool isOpen = false;
   bool isAuto = false;
   bool isAutoMode = false;
@@ -257,10 +260,10 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                                               '${selectedCloseHour}:${selectedCloseMinute}';
                                         });
                                         mqttHandler.sendSensorValue(
-                                            'esp32/sensoropen',
+                                            'esp32/minppm',
                                             sensorOpenController.text);
                                         mqttHandler.sendSensorValue(
-                                            'esp32/sensorclose',
+                                            'esp32/maxppm',
                                             sensorCloseController.text);
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/fanon',
@@ -268,10 +271,6 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/fanoff',
                                             closingTimeMessage);
-                                        print(
-                                            'Opening Time: $openingTimeMessage');
-                                        print(
-                                            'Closing Time: $closingTimeMessage');
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -409,7 +408,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                 ),
               ),
               Text(
-                'sus',
+                '',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -435,7 +434,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
               ),
               // Text widget for displaying the opening time
               Text(
-                'sus',
+                '',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,

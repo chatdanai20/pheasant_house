@@ -25,7 +25,7 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
-    isSelected = [true, false, false, false, false,false,false];
+    isSelected = [true, false, false, false,false,false,false];
     cards = [
       const CardHeat(),
       const CardAmmonia(),

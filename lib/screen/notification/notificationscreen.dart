@@ -11,6 +11,37 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  bool hasNotification = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkForNotifications();
+  }
+
+  Future<void> checkForNotifications() async {
+    final farmSnapshot = await FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .get();
+
+    bool notificationFound = false;
+
+    for (final farmDoc in farmSnapshot.docs) {
+      final farmName = farmDoc.id;
+      final notifications = await _getNotificationStatus(widget.userEmail, farmName);
+      if (notifications.isNotEmpty) {
+        notificationFound = true;
+        break;
+      }
+    }
+
+    setState(() {
+      hasNotification = notificationFound;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +51,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
           style: TextStyle(fontSize: 20),
         ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        // actions: [
+        //   if (hasNotification)
+        //     Icon(
+        //       Icons.notifications,
+        //       color: Colors.red,
+        //     )
+        // ],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -45,62 +83,68 @@ class _NotificationScreenState extends State<NotificationScreen> {
             );
           }
           return ListView.builder(
-            itemCount: farmDocuments.length,
-            itemBuilder: (context, farmIndex) {
-              final farmName = farmDocuments[farmIndex].id;
-              return FutureBuilder<Map<String, String>>(
-                future: _getNotificationStatus(widget.userEmail, farmName),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const ListTile(
-                      title: Text(
-                        'Loading...',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    return ListTile(
-                      title: Text(
-                        'Error: ${snapshot.error}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    );
-                  }
-                  final notificationStatus = snapshot.data ?? {};
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 6.0,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Farm: $farmName',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8.0),
-                        Text(
-                          notificationStatus.values.join('\n'),
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
+  itemCount: farmDocuments.length,
+  itemBuilder: (context, farmIndex) {
+    final farmName = farmDocuments[farmIndex].id;
+    return FutureBuilder<Map<String, String>>(
+      future: _getNotificationStatus(widget.userEmail, farmName),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const ListTile(
+            title: Text(
+              'Loading...',
+              style: TextStyle(fontSize: 18),
+            ),
           );
+        }
+        if (snapshot.hasError) {
+          return ListTile(
+            title: Text(
+              'Error: ${snapshot.error}',
+              style: TextStyle(fontSize: 18),
+            ),
+          );
+        }
+        final notificationStatus = snapshot.data ?? {};
+        if (notificationStatus.isNotEmpty) {
+          hasNotification = true;
+        }
+        return hasNotification
+            ? Container(
+                margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 6.0,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Farm: $farmName',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8.0),
+                    Text(
+                      notificationStatus.values.join('\n'),
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              )
+            : SizedBox(); // Return an empty SizedBox if no notification found for this farm
+      },
+    );
+  },
+);
+
         },
       ),
     );
@@ -159,42 +203,53 @@ class _NotificationScreenState extends State<NotificationScreen> {
     if (currentTemp != null) {
       if (tempMax != null && currentTemp > tempMax) {
         status['temperature'] = 'อุณหภูมิ : สูงกว่าที่กำหนด';
-      } else if (tempMin != null && currentTemp < tempMin) {
-        status['temperature'] = 'อุณหภูมิ : ต่ำกว่าที่กำหนด';
-      } else {
-        status['temperature'] = 'อุณหภูมิ : อยู่ในเกณฑ์ปกติ';
-      }
+      } //else if (tempMin != null && currentTemp < tempMin) {
+        //status['temperature'] = 'อุณหภูมิ : ต่ำกว่าที่กำหนด'; } 
+        //else {
+        //status['temperature'] = 'อุณหภูมิ : อยู่ในเกณฑ์ปกติ';
+      //}
     }
 
     if (currentAmmonia != null) {
       if (ammoniaMax != null && currentAmmonia > ammoniaMax) {
         status['ammonia'] = 'ค่าแอมโมเนีย : สูงกว่าที่กำหนด';
-      } else if (ammoniaMin != null && currentAmmonia < ammoniaMin) {
-        status['ammonia'] = 'ค่าแอมโมเนีย : ต่ำกว่าที่กำหนด';
-      } else {
-        status['ammonia'] = 'ค่าแอมโมเนีย : อยู่ในเกณฑ์ปกติ';
-      }
+      }// else if (ammoniaMin != null && currentAmmonia < ammoniaMin) {
+        //status['ammonia'] = 'ค่าแอมโมเนีย : ต่ำกว่าที่กำหนด';
+      //} else {
+        //status['ammonia'] = 'ค่าแอมโมเนีย : อยู่ในเกณฑ์ปกติ';
+      //}
     }
 
-    if (cleaningDay != null && intervalDays != null) {
-      final currentDate = DateTime.now();
-      if (currentDate.isSameDate(cleaningDay)) {
-        status['cleaning'] = 'วันทำความสะอาด : ถึงวันทำความสะอาดแล้ว';
-      } else if (currentDate.isBefore(cleaningDay)) {
-        status['cleaning'] = 'วันทำความสะอาด : ยังไม่ถึงวันทำความสะอาด';
-      } else if (currentDate.isAfter(cleaningDay)) {
-        status['cleaning'] = 'วันทำความสะอาด : เกินวันทำความสะอาดแล้ว';
-        final newCleaningDay = cleaningDay.add(Duration(days: intervalDays));
-        await FirebaseFirestore.instance
-            .collection('User')
-            .doc(userEmail)
-            .collection('farm')
-            .doc(farmName)
-            .collection('cleaning_day')
-            .doc('cleaningday')
-            .update({'cleaning_day': newCleaningDay});
-      }
+   if (cleaningDay != null && intervalDays != null) {
+  final currentDate = DateTime.now();
+  final daysUntilCleaningDay = cleaningDay.difference(currentDate).inDays;
+
+  if (daysUntilCleaningDay > 0 && daysUntilCleaningDay <= 3 ) {
+    status['cleaning'] = 'วันทำความสะอาด : ใกล้ถึงวันทำความสะอาดในอีก $daysUntilCleaningDay วัน';
+  }  if (daysUntilCleaningDay == 0) {
+    status['cleaning'] = 'วันทำความสะอาด : วันทำความสะอาดวันนี้';
+  } 
+  if (daysUntilCleaningDay  < 0){
+    final daysAfterCleaningDay = currentDate.difference(cleaningDay).inDays;
+    if (daysAfterCleaningDay >1 ) {
+      status['cleaning'] = 'วันทำความสะอาด : วันทำความสะอาดเมื่อวานนี้';
+    } else {
+      status['cleaning'] = 'วันทำความสะอาด : เมื่อวานทำความสะอาดไปแล้ว $daysAfterCleaningDay วัน';
     }
+    
+    if (currentDate.isAfter(cleaningDay)) {
+      final newCleaningDay = cleaningDay.add(Duration(days: intervalDays));
+      await FirebaseFirestore.instance
+          .collection('User')
+          .doc(userEmail)
+          .collection('farm')
+          .doc(farmName)
+          .collection('cleaning_day')
+          .doc('cleaningday')
+          .update({'cleaning_day': newCleaningDay});
+    }
+  }
+}
 
     return status;
   }

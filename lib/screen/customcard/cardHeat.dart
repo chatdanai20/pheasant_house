@@ -257,10 +257,10 @@ class _CardHeatState extends State<CardHeat> {
                                               '${selectedCloseHour}:${selectedCloseMinute}';
                                         });
                                         mqttHandler.sendSensorValue(
-                                            'esp32/sensoropen',
+                                            'esp32/minldr',
                                             sensorOpenController.text);
                                         mqttHandler.sendSensorValue(
-                                            'esp32/sensorclose',
+                                            'esp32/maxldr',
                                             sensorCloseController.text);
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/lighton',
@@ -268,10 +268,6 @@ class _CardHeatState extends State<CardHeat> {
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/lightoff',
                                             closingTimeMessage);
-                                        print(
-                                            'Opening Time: $openingTimeMessage');
-                                        print(
-                                            'Closing Time: $closingTimeMessage');
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -409,7 +405,7 @@ class _CardHeatState extends State<CardHeat> {
                 ),
               ),
               Text(
-                'sus',
+                '',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -435,7 +431,7 @@ class _CardHeatState extends State<CardHeat> {
               ),
               // Text widget for displaying the opening time
               Text(
-                'sus',
+                '',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,

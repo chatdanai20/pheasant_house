@@ -10,7 +10,7 @@ class MqttHandler {
   final String mqttServer = 'test.mosquitto.org';
   final String clientId = 'clientId-bzwIkQ3vF5';
   final String tempTopic = 'esp32/temp';
-  final String humidityTopic = 'esp32/humidity';
+  final String humidityTopic = 'esp32/hum';
   final String ldrTopic = 'esp32/ldr';
   final String mqTopic = 'esp32/mq';
   final String soilTopic = 'esp32/soil';
@@ -63,14 +63,14 @@ class MqttHandler {
     client.subscribe(mqTopic, MqttQos.atLeastOnce);
     client.subscribe(soilTopic, MqttQos.atLeastOnce);
 
-  // Listen for incoming messages and handle them
-  //   client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
-  //     final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
-  //     final String payload =
-  //         MqttPublishPayload.bytesToStringAsString(message.payload.message);
-  //     final String topic = c[0].topic;
-  //     handleMessage(topic, payload);
-  //   });
+    // Listen for incoming messages and handle them
+    //   client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+    //     final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
+    //     final String payload =
+    //         MqttPublishPayload.bytesToStringAsString(message.payload.message);
+    //     final String topic = c[0].topic;
+    //     handleMessage(topic, payload);
+    //   });
   }
 
   // Callback on MQTT disconnection
@@ -102,6 +102,7 @@ class MqttHandler {
       _soilStreamController.add(value);
     }
   }
+
   void sendSensorValue(String topic, String value) {
     if (client.connectionStatus!.state == MqttConnectionState.connected) {
       final builder = MqttClientPayloadBuilder();
