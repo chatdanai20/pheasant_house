@@ -9,7 +9,10 @@ import '../../constants.dart';
 import '../chartscreen/chartscreen1.dart';
 
 class CardGraph extends StatefulWidget {
-  const CardGraph({super.key});
+  final String email;
+  final String farmName;
+
+  const CardGraph({super.key, required this.email, required this.farmName});
 
   @override
   State<CardGraph> createState() => _CardGraphState();
@@ -44,31 +47,31 @@ class _CardGraphState extends State<CardGraph> {
                   children: [
                     Column(
                       children: [
-                        const ChartBar1(),
+                        ChartBar1(email: widget.email, farmName: widget.farmName),
                         exportData('ความเข้มแสง'),
                       ],
                     ),
                     Column(
                       children: [
-                        ChartBar2(),
+                        ChartBar2(email: widget.email, farmName: widget.farmName),
                         exportData('อุณหภูมิ'),
                       ],
                     ),
                     Column(
                       children: [
-                        ChartBar3(),
+                        ChartBar3(email: widget.email, farmName: widget.farmName),
                         exportData('ความชื้นในอากาศ'),
                       ],
                     ),
                     Column(
                       children: [
-                        ChartBar4(),
+                        ChartBar4(email: widget.email, farmName: widget.farmName),
                         exportData('ความชื้นในดิน'),
                       ],
                     ),
                     Column(
                       children: [
-                        ChartBar5(),
+                        ChartBar5(email: widget.email, farmName: widget.farmName),
                         exportData('แอมโมเนีย'),
                       ],
                     ),

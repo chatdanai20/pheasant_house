@@ -1,43 +1,57 @@
-import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-
 import '../../constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+
 
 class _Chart extends StatelessWidget {
-  const _Chart({required this.isShowingMainData});
+  const _Chart({required this.isShowingMainData, required this.hourlyAverageSpots});
 
   final bool isShowingMainData;
+  final List<FlSpot> hourlyAverageSpots; // Add this line
 
-  @override
+@override
   Widget build(BuildContext context) {
-    return isShowingMainData
-        ? LineChart(sampleData2, duration: const Duration(milliseconds: 250))
-        : BarChart(sampleData1,
-            swapAnimationDuration: const Duration(milliseconds: 250));
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          LineChartBarData(
+            isCurved: true,
+            curveSmoothness: 0,
+            color: kDefaultColor.withOpacity(0.5),
+            barWidth: 4,
+            isStrokeCapRound: true,
+            dotData: const FlDotData(show: false),
+            belowBarData: BarAreaData(show: false),
+            spots: hourlyAverageSpots, // Update this line
+          ),
+        ],
+        titlesData: titlesData2,
+        gridData: gridData,
+        borderData: borderData,
+        minX: 0,
+        maxX: 23,
+        maxY: 40, // Adjust according to your data
+        minY: 0,
+      ),
+    );
   }
 
-  BarChartData get sampleData1 => BarChartData(
-        barTouchData: barTouchData,
-        titlesData: titlesData1,
-        borderData: borderData,
-        barGroups: barGroups1,
-        gridData: gridData,
-        alignment: BarChartAlignment.spaceAround,
-        maxY: 6,
-      );
-
-  LineChartData get sampleData2 => LineChartData(
-        lineTouchData: lineTouchData2,
-        gridData: gridData,
-        titlesData: titlesData2,
-        borderData: borderData,
-        lineBarsData: lineBarsData2,
-        minX: 0,
-        maxX: 14,
-        maxY: 6,
-        minY: 0,
+  FlTitlesData get titlesData2 => FlTitlesData(
+        bottomTitles: AxisTitles(
+          sideTitles: bottomTitles,
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: leftTitles(),
+        ),
+        topTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        rightTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
       );
 
   FlGridData get gridData => FlGridData(
@@ -59,67 +73,15 @@ class _Chart extends StatelessWidget {
         },
       );
 
-  BarTouchData get barTouchData => BarTouchData(
-        touchTooltipData: BarTouchTooltipData(
-          getTooltipColor: (BarChartGroupData group) => Colors.white,
-        ),
-        touchCallback: (FlTouchEvent event, BarTouchResponse? touchResponse) {
-          // Handle touch callback here
-        },
-      );
-
-  FlTitlesData get titlesData1 => FlTitlesData(
-        bottomTitles: AxisTitles(
-          sideTitles: bottomTitles,
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: leftTitles(),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
+  FlBorderData get borderData => FlBorderData(
+        show: true,
+        border: Border(
+          bottom: BorderSide(color: kDefaultColor.withOpacity(0.2), width: 4),
+          left: const BorderSide(color: Colors.transparent),
+          right: const BorderSide(color: Colors.transparent),
+          top: const BorderSide(color: Colors.transparent),
         ),
       );
-
-  List<BarChartGroupData> get barGroups1 {
-    final random = Random();
-    return List.generate(7, (index) {
-      double x = index * 2.0 + 1;
-      double y = random.nextDouble() * 5;
-      return BarChartGroupData(x: x.toInt(), barRods: [barRodData(y)]);
-    });
-  }
-
-  BarChartRodData barRodData(double y) => BarChartRodData(
-        toY: y,
-        color: kDefaultColor,
-        width: 8,
-      );
-
-  LineTouchData get lineTouchData2 => const LineTouchData(
-        enabled: false,
-      );
-
-  FlTitlesData get titlesData2 => FlTitlesData(
-        bottomTitles: AxisTitles(
-          sideTitles: bottomTitles,
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: leftTitles(),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-      );
-
-  List<LineChartBarData> get lineBarsData2 => [
-        lineChartBarData2_1,
-      ];
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
@@ -206,40 +168,13 @@ class _Chart extends StatelessWidget {
         interval: 1,
         getTitlesWidget: bottomTitleWidgets,
       );
-
-  FlBorderData get borderData => FlBorderData(
-        show: true,
-        border: Border(
-          bottom: BorderSide(color: kDefaultColor.withOpacity(0.2), width: 4),
-          left: const BorderSide(color: Colors.transparent),
-          right: const BorderSide(color: Colors.transparent),
-          top: const BorderSide(color: Colors.transparent),
-        ),
-      );
-
-  LineChartBarData get lineChartBarData2_1 {
-    final random = Random();
-    final List<FlSpot> spots = List.generate(7, (index) {
-      double x = index * 2.0;
-      double y = random.nextDouble() * 5;
-      return FlSpot(x, y);
-    });
-
-    return LineChartBarData(
-      isCurved: true,
-      curveSmoothness: 0,
-      color: kDefaultColor.withOpacity(0.5),
-      barWidth: 4,
-      isStrokeCapRound: true,
-      dotData: const FlDotData(show: false),
-      belowBarData: BarAreaData(show: false),
-      spots: spots,
-    );
-  }
 }
-
 class ChartBar2 extends StatefulWidget {
-  const ChartBar2({super.key});
+  final DateTime? selectedDate; // Add this line
+  final String email; // Add this line
+  final String farmName; // Add this line
+
+  const ChartBar2({super.key, this.selectedDate, required this.email, required this.farmName}); // Add this line
 
   @override
   State<StatefulWidget> createState() => ChartBar2State();
@@ -247,12 +182,59 @@ class ChartBar2 extends StatefulWidget {
 
 class ChartBar2State extends State<ChartBar2> {
   late bool isShowingMainData;
+  List<FlSpot> hourlyAverageSpots = []; // Add this line
 
   @override
   void initState() {
     super.initState();
     isShowingMainData = true;
+    if (widget.selectedDate != null) {
+      _fetchHourlyData(widget.selectedDate!, widget.email, widget.farmName); // Add this line
+    }
   }
+
+   Future<void> _fetchHourlyData(DateTime date, String email, String farmName) async {
+    String dateStr = DateFormat('yyyy-M-d').format(date);
+
+    CollectionReference environment = FirebaseFirestore.instance
+        .collection('User')
+        .doc(email)
+        .collection('farm')
+        .doc(farmName)
+        .collection('environment');
+
+    QuerySnapshot querySnapshot = await environment
+        .where(FieldPath.documentId, isGreaterThanOrEqualTo: '${dateStr}_00:00:00')
+        .where(FieldPath.documentId, isLessThanOrEqualTo: '${dateStr}_23:59:59')
+        .get();
+
+    Map<int, List<double>> hourlyData = {};
+
+    for (var doc in querySnapshot.docs) {
+      String docId = doc.id;
+      List<String> parts = docId.split('_');
+      String timeString = parts[1];
+      int hour = int.parse(timeString.split(':')[0]);
+
+      double temperature = doc['temperature']; // Replace with actual field name
+
+      if (hourlyData[hour] == null) {
+        hourlyData[hour] = [];
+      }
+      hourlyData[hour]!.add(temperature);
+    }
+
+    List<FlSpot> spots = [];
+    hourlyData.forEach((hour, temps) {
+      double avgTemp = temps.reduce((a, b) => a + b) / temps.length;
+      spots.add(FlSpot(hour.toDouble(), avgTemp));
+    });
+
+    setState(() {
+      hourlyAverageSpots = spots;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -269,7 +251,7 @@ class ChartBar2State extends State<ChartBar2> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(right: 1, left: 1),
-                  child: _Chart(isShowingMainData: isShowingMainData),
+                  child: _Chart(isShowingMainData: isShowingMainData, hourlyAverageSpots: hourlyAverageSpots), // Update this line
                 ),
               ),
             ],

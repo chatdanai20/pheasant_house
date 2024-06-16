@@ -23,9 +23,9 @@ class ChartScreen extends StatefulWidget {
 
 class _ChartScreenState extends State<ChartScreen> {
   final PageController _controller = PageController();
-  DateTime? selectedDate;
   List<DateTime> availableDates = [];
   List<Map<String, dynamic>> hourlyData = [];
+  DateTime? selectedDate; // Add this line
 
   @override
   void initState() {
@@ -43,17 +43,21 @@ class _ChartScreenState extends State<ChartScreen> {
               padding: const EdgeInsets.only(top: 10, right: 10),
               child: Row(
                 children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.arrow_back),
-                  ),
-                  const Text(
-                    'ข้อมูลย้อนหลัง',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: const Icon(Icons.arrow_back),
+                      ),
+                      const Text(
+                        'ข้อมูลย้อนหลัง',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -65,112 +69,15 @@ class _ChartScreenState extends State<ChartScreen> {
               child: PageView(
                 controller: _controller,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        children: [
-                          header('ความเข้มแสง'),
-                          const Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: ChartBar1(),
-                          ),
-                          exportData(),
-                          if (hourlyData.isNotEmpty)
-                            ...hourlyData
-                                .map((data) => Text(
-                                    'Hour: ${data['hour']}, Value: ${data['value']}'))
-                                .toList(),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        children: [
-                          header('อุณหภูมิ'),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: ChartBar2(),
-                          ),
-                          exportData(),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        children: [
-                          header('ความชื้นในอากาศ'),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: ChartBar3(),
-                          ),
-                          exportData(),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        children: [
-                          header('ความชื้นในดิน'),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: ChartBar4(),
-                          ),
-                          exportData(),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        children: [
-                          header('แอมโมเนีย'),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: ChartBar5(),
-                          ),
-                          exportData(),
-                        ],
-                      ),
-                    ),
-                  ),
+                  buildChartContainer('ความเข้มแสง', ChartBar1(selectedDate: selectedDate, email: widget.email, farmName: widget.farmName)),
+                  buildChartContainer('อุณหภูมิ', ChartBar2(selectedDate: selectedDate, email: widget.email, farmName: widget.farmName)),
+                  buildChartContainer('ความชื้นในอากาศ', ChartBar3(selectedDate: selectedDate, email: widget.email, farmName: widget.farmName)),
+                  buildChartContainer('ความชื้นในดิน', ChartBar4(selectedDate: selectedDate, email: widget.email, farmName: widget.farmName)),
+                  buildChartContainer('แอมโมเนีย', ChartBar5(selectedDate: selectedDate, email: widget.email, farmName: widget.farmName)),
                 ],
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             SmoothPageIndicator(
               controller: _controller,
               count: 5,
@@ -184,7 +91,29 @@ class _ChartScreenState extends State<ChartScreen> {
     );
   }
 
-  header(String title) {
+  Widget buildChartContainer(String title, Widget chartWidget) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          children: [
+            header(title),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: chartWidget,
+            ),
+            exportData(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget header(String title) {
     return Column(
       children: [
         Padding(
@@ -207,7 +136,7 @@ class _ChartScreenState extends State<ChartScreen> {
     );
   }
 
-  exportData() {
+  Widget exportData() {
     return Column(
       children: [
         const Padding(
@@ -237,19 +166,22 @@ class _ChartScreenState extends State<ChartScreen> {
           ),
           child: InkWell(
             onTap: () => _showDateSelectionDialog(context),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'เลือกวันที่',
-                    style: TextStyle(color: Colors.white),
+                    selectedDate != null
+                        ? DateFormat('dd/MM/yyyy').format(selectedDate!)
+                        : 'เลือกวันที่',
+                    style: const TextStyle(color: Colors.white),
                   ),
-                  Icon(
-                    Icons.calendar_month,
+                  const Icon(
+                    Icons.calendar_today,
                     size: 25,
+                    color: Colors.white,
                   )
                 ],
               ),
@@ -298,88 +230,101 @@ class _ChartScreenState extends State<ChartScreen> {
     );
   }
 
-  Future<void> _fetchData([DateTime? selectedDate]) async {
-  String userEmail = widget.email;
-  String farmName = widget.farmName;
+  Future<void> _fetchData() async {
+    String userEmail = widget.email;
+    String farmName = widget.farmName;
 
-  CollectionReference environment = FirebaseFirestore.instance
-      .collection('User')
-      .doc(userEmail)
-      .collection('farm')
-      .doc(farmName)
-      .collection('environment');
+    CollectionReference environment = FirebaseFirestore.instance
+        .collection('User')
+        .doc(userEmail)
+        .collection('farm')
+        .doc(farmName)
+        .collection('environment');
 
-  QuerySnapshot querySnapshot;
+    QuerySnapshot querySnapshot = await environment.get();
 
-  if (selectedDate != null) {
-    DateTime startDate = DateTime(
-        selectedDate.year, selectedDate.month, selectedDate.day, 0, 0);
-    DateTime endDate = DateTime(
-        selectedDate.year, selectedDate.month, selectedDate.day, 23, 59);
+    // Initialize lists to store data
+    List<DateTime> availableDates = [];
 
-    querySnapshot = await environment
-        .where('timestamp', isGreaterThanOrEqualTo: startDate)
-        .where('timestamp', isLessThanOrEqualTo: endDate)
-        .get();
-  } else {
-    querySnapshot = await environment.get();
-  }
+    // Iterate through documents
+    for (var doc in querySnapshot.docs) {
+      String docId = doc.id; // Get the document ID ("2024-5-29_18:37:38")
 
-  List<Map<String, dynamic>> hourlyData = [];
-  List<DateTime> availableDates = [];
+      // Split docId to separate date and time parts
+      List<String> parts = docId.split('_');
+      String dateString = parts[0]; // "2024-5-29"
 
-  for (var doc in querySnapshot.docs) {
-    Timestamp timestamp = doc.get('timestamp');
-    DateTime dateTime = timestamp.toDate();
+      try {
+        // Parse the date part only
+        DateTime dateTime = DateFormat('yyyy-M-d').parse(dateString);
 
-    if (!availableDates.contains(dateTime)) {
-      availableDates.add(dateTime);
+        // Check if the date is already in availableDates list
+        if (!availableDates.any((date) =>
+            date.year == dateTime.year &&
+            date.month == dateTime.month &&
+            date.day == dateTime.day)) {
+          availableDates.add(dateTime);
+        }
+      } catch (e) {
+        print('Error parsing date: $dateString');
+        print(e);
+      }
     }
 
-    hourlyData.add({
-      'docId': doc.id,  // เพิ่ม docId เข้าไปในข้อมูลที่ดึงมา
-      'hour': doc.get('hour'),
-      'value': doc.get('value'),
+    // Sort availableDates list
+    availableDates.sort((a, b) => a.compareTo(b));
+
+    // Update state with fetched data
+    setState(() {
+      this.availableDates = availableDates;
+    });
+
+    // Print the fetched data after conversion
+    print('Fetched Data:');
+    print('Available Dates:');
+    availableDates.forEach((date) {
+      print(DateFormat('dd/MM/yyyy').format(date));
     });
   }
 
-  setState(() {
-    this.availableDates = availableDates;
-    this.hourlyData = hourlyData;
-  });
-}
-
-
-
   Future<void> _showDateSelectionDialog(BuildContext context) async {
-  await showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('เลือกวันที่'),
-        content: SizedBox(
-          width: double.minPositive,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: availableDates.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(
-                    DateFormat('dd/MM/yyyy').format(availableDates[index])),
-                onTap: () {
-                  setState(() {
-                    selectedDate = availableDates[index];
-                    _fetchData(selectedDate!);
-                  });
-                  Navigator.pop(context);
-                },
-              );
-            },
-          ),
-        ),
-      );
-    },
-  );
-}
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('เลือกวันที่'),
+          content: SizedBox(
+            width: double.minPositive,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: availableDates.length,
+              itemBuilder: (context, index) {
+                // Format the dateTime to 'dd/MM/yyyy'
+                String formattedDateTime =
+                    DateFormat('dd/MM/yyyy').format(availableDates[index]);
 
+                return ListTile(
+                  title: Text(formattedDateTime),
+                  onTap: () {
+                    setState(() {
+                      selectedDate = availableDates[index];
+                    });
+                    Navigator.of(context).pop();
+                  },
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('ยกเลิก'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

@@ -36,7 +36,6 @@ class _CardHeatState extends State<CardHeat> {
       });
     });
   }
-
   void switchToManualMode() {
     setState(() {
       isAutoMode = false;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pheasant_house/screen/chartscreen/chartscreen.dart';
+import 'package:pheasant_house/screen/functionMQTT.dart/mqtt.dart';
 import 'package:pheasant_house/screen/menuscreen/menuscreen.dart';
 import 'package:pheasant_house/screen/homescreen/homescreen.dart';
 import 'package:pheasant_house/screen/profileScreen/profilescreen.dart'; // Import the profile screen
@@ -19,6 +20,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final MqttHandler mqttHandler = MqttHandler();
   late User? _user;
   late String _userEmail = '';
   String displayText = 'เลือกข้อมูลที่ต้องการดู';
@@ -36,7 +38,13 @@ class _MainScreenState extends State<MainScreen> {
     _userEmail = _user?.email ?? '';
     initializeDateFormatting('th', null).then((_) {
       fetchHouseData();
-      
+    });
+    
+    // Subscribe to the LDR stream to get real-time updates
+    mqttHandler.ldrStream.listen((double ldrValue) {
+      setState(() {
+        ldrValue = ldrValue;
+      });
     });
   }
 
@@ -53,8 +61,6 @@ class _MainScreenState extends State<MainScreen> {
           .collection('environment')
           .doc('now')
           .get();
-    
-    
 
       if (farmData.exists) {
         setState(() {
@@ -73,26 +79,27 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
- 
-
   String getThaiFormattedDate(DateTime date) {
     return DateFormat.yMMMMEEEEd('th').format(date);
   }
-
-  
-
- @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: SafeArea(
-      child: Stack(
-        children: [
-          if (houseData == null)
-            Center(child: CircularProgressIndicator())
-          else
-            Column(
-              children: [
-                Column(
+  @override
+  void dispose() {
+    // Dispose of the MqttHandler when the widget is disposed
+    mqttHandler.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            if (houseData == null)
+              Center(child: CircularProgressIndicator())
+            else
+              Column(
+                children: [
+                  Column(
                     children: [
                       Padding(
                         padding:
@@ -104,7 +111,7 @@ Widget build(BuildContext context) {
                               children: [
                                 IconButton(
                                   onPressed: () {
-                                   Navigator.pop(context);
+                                    Navigator.pop(context);
                                   },
                                   icon: const Icon(Icons.arrow_back),
                                 ),
@@ -142,93 +149,96 @@ Widget build(BuildContext context) {
                               ],
                             ),
                             Row(
-                    children: [
-                      if (hasNotification)
-                          Stack(
-                            children: [
-                              Icon(
-                                Icons.notifications,
-                                color: Colors.red,
-                              ),
-                              Positioned(
-                                right: 0,
-                                child: Container(
-                                  padding: EdgeInsets.all(1),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(6),
+                              children: [
+                                if (hasNotification)
+                                  Stack(
+                                    children: [
+                                      Icon(
+                                        Icons.notifications,
+                                        color: Colors.red,
+                                      ),
+                                      Positioned(
+                                        right: 0,
+                                        child: Container(
+                                          padding: EdgeInsets.all(1),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
+                                          constraints: BoxConstraints(
+                                            minWidth: 12,
+                                            minHeight: 12,
+                                          ),
+                                          child: Text(
+                                            '$_notificationCount',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 8,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  constraints: BoxConstraints(
-                                    minWidth: 12,
-                                    minHeight: 12,
-                                  ),
-                                  child: Text(
-                                    '$_notificationCount',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 8,
+                                PopupMenuButton<String>(
+                                  onSelected: (String value) {
+                                    switch (value) {
+                                      case 'notification':
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                NotificationScreen(
+                                                    userEmail: _userEmail),
+                                          ),
+                                        ).then((_) {
+                                          setState(() {
+                                            hasNotification = false;
+                                            _notificationCount = 0;
+                                          });
+                                        });
+                                        break;
+                                      case 'information':
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ProfileScreen(),
+                                          ),
+                                        );
+                                        break;
+                                      case 'logout':
+                                        FirebaseAuth.instance.signOut();
+                                        Navigator.pop(context);
+                                        break;
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) =>
+                                      <PopupMenuEntry<String>>[
+                                    const PopupMenuItem<String>(
+                                      value: 'notification',
+                                      child: Text('Notification'),
                                     ),
-                                    textAlign: TextAlign.center,
+                                    const PopupMenuItem<String>(
+                                      value: 'information',
+                                      child: Text('Profile'),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'logout',
+                                      child: Text('Logout'),
+                                    ),
+                                  ],
+                                  icon: Image.asset(
+                                    'asset/images/list.png',
+                                    width: 35,
+                                    height: 35,
+                                    color: Colors.black,
                                   ),
                                 ),
-                              )
-                            ],
-                          ),
-                      PopupMenuButton<String>(
-                        onSelected: (String value) {
-                          switch (value) {
-                            case 'notification':
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => NotificationScreen(
-                                        userEmail: _userEmail),
-                                  ),
-                                ).then((_) {
-                                  setState(() {
-                                    hasNotification = false;
-                                    _notificationCount = 0;
-                                  });
-                                });
-                                break;
-                            case 'information':
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ProfileScreen(),
-                                ),
-                              );
-                              break;
-                            case 'logout':
-                              FirebaseAuth.instance.signOut();
-                              Navigator.pop(context);
-                              break;
-                          }
-                        },
-                        itemBuilder: (BuildContext context) =>
-                            <PopupMenuEntry<String>>[
-                          const PopupMenuItem<String>(
-                            value: 'notification',
-                            child: Text('Notification'),
-                          ),
-                          const PopupMenuItem<String>(
-                            value: 'information',
-                            child: Text('Profile'),
-                          ),
-                          const PopupMenuItem<String>(
-                            value: 'logout',
-                            child: Text('Logout'),
-                          ),
-                        ],
-                        icon: Image.asset(
-                          'asset/images/list.png',
-                          width: 35,
-                          height: 35,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -398,13 +408,13 @@ Widget build(BuildContext context) {
                       ),
                     ],
                   ),
-              ],
-            ),
-        ],
+                ],
+              ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _infoCard(String title, IconData icon, String value, String image) {
     return GestureDetector(
@@ -472,15 +482,15 @@ Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChartScreen(
-            farmName: widget.farmName,
-            email: _userEmail,
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChartScreen(
+              farmName: widget.farmName,
+              email: _userEmail,
+            ),
           ),
-        ),
-      );
-    },
+        );
+      },
       child: Container(
         width: 110,
         height: 150,
