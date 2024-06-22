@@ -88,7 +88,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width / 1.2,
-      height: MediaQuery.of(context).size.height / 1.5,
+      height: MediaQuery.of(context).size.height / 1.4,
       decoration: const BoxDecoration(
         color: Color(0xFFFFFFFF),
         borderRadius: BorderRadius.only(
@@ -258,27 +258,49 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                                           closingTimeMessage =
                                               '${selectedCloseHour}:${selectedCloseMinute}';
                                         });
+                                         String openingTimeToSend =
+                                            selectedOpenHour != 0 ||
+                                                    selectedOpenMinute != 0
+                                                ? '${selectedOpenHour}:${selectedOpenMinute}'
+                                                : 'null';
+
+                                        String closingTimeToSend =
+                                            selectedCloseHour != 0 ||
+                                                    selectedCloseMinute != 0
+                                                ? '${selectedCloseHour}:${selectedCloseMinute}'
+                                                : 'null';
+
+                                        String sensorOpenToSend =
+                                            sensorOpenController.text.isNotEmpty
+                                                ? sensorOpenController.text
+                                                : 'null';
+
+                                        String sensorCloseToSend =
+                                            sensorCloseController
+                                                    .text.isNotEmpty
+                                                ? sensorCloseController.text
+                                                : 'null';
                                         mqttHandler.sendSensorValue(
                                             'esp32/minppm',
-                                            sensorOpenController.text);
+                                            sensorOpenToSend);
                                         mqttHandler.sendSensorValue(
                                             'esp32/maxppm',
-                                            sensorCloseController.text);
+                                            sensorCloseToSend);
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/fanon',
-                                            openingTimeMessage);
+                                            openingTimeToSend);
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/fanoff',
-                                            closingTimeMessage);
+                                            closingTimeToSend );
                                         Navigator.pop(context);
                                       },
                                     ),
                                   ],
                                 ),
                               ),
-                              buildInputText('ค่าเซนเซอร์เปิด ', 'อุณหภูมิ',
+                              buildInputText('ค่าเซนเซอร์เปิด ', 'แอมโมเนีย',
                                   sensorOpenController),
-                              buildInputText('ค่าเซนเซอร์ปิด ', 'อุณหภูมิ',
+                              buildInputText('ค่าเซนเซอร์ปิด ', 'แอมโมเนีย',
                                   sensorCloseController),
                               const SizedBox(
                                 height: 10,
@@ -334,6 +356,11 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                                   ),
                                 ],
                               ),
+                               SizedBox(height: 20),
+                              // Displaying sensor values for testing
+                              Text('Sensor Open: ${sensorOpenController.text}'),
+                              Text(
+                                  'Sensor Close: ${sensorCloseController.text}'),
                             ],
                           ),
                         ),
@@ -347,7 +374,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
           const SizedBox(
             height: 10,
           ),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -359,7 +386,9 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                 ),
               ),
               Text(
-                ' 40 °C',
+                sensorOpenController.text.isNotEmpty
+                    ? ' ${sensorOpenController.text} °C'
+                    : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -368,10 +397,8 @@ class _CardAmmoniaState extends State<CardAmmonia> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -383,7 +410,9 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                 ),
               ),
               Text(
-                ' 25 °C',
+                sensorCloseController.text.isNotEmpty
+                    ? ' ${sensorCloseController.text} °C'
+                    : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -392,10 +421,8 @@ class _CardAmmoniaState extends State<CardAmmonia> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -407,7 +434,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                 ),
               ),
               Text(
-                '',
+                openingTimeMessage != 'null' ? ' $openingTimeMessage' : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -416,13 +443,10 @@ class _CardAmmoniaState extends State<CardAmmonia> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Text widget for displaying the label "เวลาเปิด"
               Text(
                 'เวลาปิด ',
                 style: TextStyle(
@@ -431,9 +455,8 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              // Text widget for displaying the opening time
               Text(
-                '',
+                closingTimeMessage != 'null' ? ' $closingTimeMessage' : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,

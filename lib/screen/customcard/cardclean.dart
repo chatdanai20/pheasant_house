@@ -166,7 +166,7 @@ class _CardCleanState extends State<CardClean> {
 
         return Container(
           width: MediaQuery.of(context).size.width / 1.3,
-          height: MediaQuery.of(context).size.height / 1.7,
+          height: MediaQuery.of(context).size.height / 1.4,
           decoration: const BoxDecoration(
             color: Color(0xFFFFFFFF),
             borderRadius: BorderRadius.only(

@@ -86,7 +86,7 @@ class _CardMoistureState extends State<CardMoisture> {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width / 1.2,
-      height: MediaQuery.of(context).size.height / 1.5,
+      height: MediaQuery.of(context).size.height / 1.4,
       decoration: const BoxDecoration(
         color: Color(0xFFFFFFFF),
         borderRadius: BorderRadius.only(
@@ -256,18 +256,40 @@ class _CardMoistureState extends State<CardMoisture> {
                                           closingTimeMessage =
                                               '${selectedCloseHour}:${selectedCloseMinute}';
                                         });
+                                        String openingTimeToSend =
+                                            selectedOpenHour != 0 ||
+                                                    selectedOpenMinute != 0
+                                                ? '${selectedOpenHour}:${selectedOpenMinute}'
+                                                : 'null';
+
+                                        String closingTimeToSend =
+                                            selectedCloseHour != 0 ||
+                                                    selectedCloseMinute != 0
+                                                ? '${selectedCloseHour}:${selectedCloseMinute}'
+                                                : 'null';
+
+                                        String sensorOpenToSend =
+                                            sensorOpenController.text.isNotEmpty
+                                                ? sensorOpenController.text
+                                                : 'null';
+
+                                        String sensorCloseToSend =
+                                            sensorCloseController
+                                                    .text.isNotEmpty
+                                                ? sensorCloseController.text
+                                                : 'null';
                                         mqttHandler.sendSensorValue(
                                             'esp32/minsoil',
-                                            sensorOpenController.text);
+                                           sensorOpenToSend);
                                         mqttHandler.sendSensorValue(
                                             'esp32/maxsoil',
-                                            sensorCloseController.text);
+                                           sensorCloseToSend);
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/motor1on',
-                                            openingTimeMessage);
+                                            openingTimeToSend );
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/motor1off',
-                                            closingTimeMessage);
+                                            closingTimeToSend);
 
                                         Navigator.pop(context);
                                       },
@@ -275,9 +297,9 @@ class _CardMoistureState extends State<CardMoisture> {
                                   ],
                                 ),
                               ),
-                              buildInputText('ค่าเซนเซอร์เปิด ', 'อุณหภูมิ',
+                              buildInputText('ค่าเซนเซอร์เปิด ', 'ความชื้นในดิน',
                                   sensorOpenController),
-                              buildInputText('ค่าเซนเซอร์ปิด ', 'อุณหภูมิ',
+                              buildInputText('ค่าเซนเซอร์ปิด ', 'ความชื้นในดิน',
                                   sensorCloseController),
                               const SizedBox(
                                 height: 10,
@@ -333,6 +355,11 @@ class _CardMoistureState extends State<CardMoisture> {
                                   ),
                                 ],
                               ),
+                               SizedBox(height: 20),
+                              // Displaying sensor values for testing
+                              Text('Sensor Open: ${sensorOpenController.text}'),
+                              Text(
+                                  'Sensor Close: ${sensorCloseController.text}'),
                             ],
                           ),
                         ),
@@ -343,10 +370,8 @@ class _CardMoistureState extends State<CardMoisture> {
               );
             },
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+       SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -358,7 +383,9 @@ class _CardMoistureState extends State<CardMoisture> {
                 ),
               ),
               Text(
-                ' 405 °C',
+                sensorOpenController.text.isNotEmpty
+                    ? ' ${sensorOpenController.text} °C'
+                    : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -367,10 +394,8 @@ class _CardMoistureState extends State<CardMoisture> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -382,7 +407,9 @@ class _CardMoistureState extends State<CardMoisture> {
                 ),
               ),
               Text(
-                ' 25 °C',
+                sensorCloseController.text.isNotEmpty
+                    ? ' ${sensorCloseController.text} °C'
+                    : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -391,10 +418,8 @@ class _CardMoistureState extends State<CardMoisture> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -406,7 +431,7 @@ class _CardMoistureState extends State<CardMoisture> {
                 ),
               ),
               Text(
-                '',
+                openingTimeMessage != 'null' ? ' $openingTimeMessage' : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -415,13 +440,10 @@ class _CardMoistureState extends State<CardMoisture> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Text widget for displaying the label "เวลาเปิด"
               Text(
                 'เวลาปิด ',
                 style: TextStyle(
@@ -430,9 +452,8 @@ class _CardMoistureState extends State<CardMoisture> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              // Text widget for displaying the opening time
               Text(
-                '',
+                closingTimeMessage != 'null' ? ' $closingTimeMessage' : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -459,7 +480,7 @@ Widget buildInputText(
         padding: const EdgeInsets.only(left: 30),
         child: Text(
           name,
-          style: const TextStyle(color: Color(0xFF6FC0C5), fontSize: 16),
+          style: TextStyle(color: Color(0xFF6FC0C5), fontSize: 16),
         ),
       ),
       Padding(
@@ -468,7 +489,7 @@ Widget buildInputText(
           width: 330.0,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: const Color(0xFF6FC0C5),
+            color: Color(0xFF6FC0C5),
             borderRadius: BorderRadius.circular(20),
           ),
           child: TextField(
@@ -478,7 +499,7 @@ Widget buildInputText(
               hintText: nameHint,
               hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
             ),
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 16,
             ),

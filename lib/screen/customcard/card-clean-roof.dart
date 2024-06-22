@@ -86,7 +86,7 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width / 1.2,
-      height: MediaQuery.of(context).size.height / 1.5,
+      height: MediaQuery.of(context).size.height / 1.3,
       decoration: const BoxDecoration(
         color: Color(0xFFFFFFFF),
         borderRadius: BorderRadius.only(
@@ -256,18 +256,40 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                                           closingTimeMessage =
                                               '${selectedCloseHour}:${selectedCloseMinute}';
                                         });
+                                           String openingTimeToSend =
+                                            selectedOpenHour != 0 ||
+                                                    selectedOpenMinute != 0
+                                                ? '${selectedOpenHour}:${selectedOpenMinute}'
+                                                : 'null';
+
+                                        String closingTimeToSend =
+                                            selectedCloseHour != 0 ||
+                                                    selectedCloseMinute != 0
+                                                ? '${selectedCloseHour}:${selectedCloseMinute}'
+                                                : 'null';
+
+                                        String sensorOpenToSend =
+                                            sensorOpenController.text.isNotEmpty
+                                                ? sensorOpenController.text
+                                                : 'null';
+
+                                        String sensorCloseToSend =
+                                            sensorCloseController
+                                                    .text.isNotEmpty
+                                                ? sensorCloseController.text
+                                                : 'null';
                                         mqttHandler.sendSensorValue(
                                             'esp32/mintemp',
-                                            sensorOpenController.text);
+                                            sensorOpenToSend);
                                         mqttHandler.sendSensorValue(
                                             'esp32/maxtemp',
-                                            sensorCloseController.text);
+                                            sensorCloseToSend);
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/motor2on',
-                                            openingTimeMessage);
+                                           openingTimeToSend);
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/motor2off',
-                                            closingTimeMessage);
+                                            closingTimeToSend);
                                         // print(tempValue);
                                         Navigator.pop(context);
                                       },
@@ -304,6 +326,7 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                                       (int newVal) => setState(
                                           () => selectedOpenMinute = newVal)),
                                 ],
+
                               ),
                               const SizedBox(
                                 height: 10,
@@ -333,7 +356,13 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                                   ),
                                 ],
                               ),
+                               SizedBox(height: 20),
+                              // Displaying sensor values for testing
+                              Text('Sensor Open: ${sensorOpenController.text}'),
+                              Text(
+                                  'Sensor Close: ${sensorCloseController.text}'),
                             ],
+                  
                           ),
                         ),
                       );
@@ -346,7 +375,7 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
           const SizedBox(
             height: 10,
           ),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -358,7 +387,9 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                 ),
               ),
               Text(
-                ' 40 °C',
+                sensorOpenController.text.isNotEmpty
+                    ? ' ${sensorOpenController.text} °C'
+                    : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -367,10 +398,8 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -382,7 +411,9 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                 ),
               ),
               Text(
-                ' 25 °C',
+                sensorCloseController.text.isNotEmpty
+                    ? ' ${sensorCloseController.text} °C'
+                    : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -391,10 +422,8 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -406,7 +435,7 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                 ),
               ),
               Text(
-                '',
+                openingTimeMessage != 'null' ? ' $openingTimeMessage' : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -415,13 +444,10 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Text widget for displaying the label "เวลาเปิด"
               Text(
                 'เวลาปิด ',
                 style: TextStyle(
@@ -430,9 +456,8 @@ class _CardCleanRoofState extends State<CardCleanRoof> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              // Text widget for displaying the opening time
               Text(
-                '',
+                closingTimeMessage != 'null' ? ' $closingTimeMessage' : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,

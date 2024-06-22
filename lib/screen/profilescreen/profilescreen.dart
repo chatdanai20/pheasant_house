@@ -120,14 +120,31 @@ class ProfileScreen extends StatelessWidget {
                                 Row(
                                   children: [
                                     Text(
-                                      'ชื่อ-นามสกุล : ',
+                                      'ชื่อ : ',
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     Text(
-                                      '${userData['name']} ${userData['lastname']}',
+                                      '${userData['name']} ',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      'นามสกุล : ',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      ' ${userData['lastname']}',
                                       style: TextStyle(
                                         fontSize: 18,
                                       ),

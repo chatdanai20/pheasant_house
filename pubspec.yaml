@@ -7,8 +7,6 @@ version: 1.0.0+1
 
 environment:
   sdk: ">=3.2.0 <4.0.0"
-
-
 dependencies:
   flutter:
     sdk: flutter
@@ -20,7 +18,6 @@ dependencies:
   flutter_mqtt: ^1.0.0+5
   file_picker: ^8.0.3
   csv: ^6.0.0
-
   cupertino_icons: ^1.0.2
   flutter_svg: ^2.0.10+1
   fl_chart: ^0.68.0
@@ -31,12 +28,21 @@ dependencies:
   fluttertoast: ^8.0.9
   flutter_intl: ^0.0.1
   intl: ^0.19.0
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
+  excel: ^4.0.3
   flutter_lints: ^4.0.0
+  provider: ^6.1.2
+  permission_handler: ^11.3.1
+  printing: ^5.12.0
+  flutter_charts: ^0.5.2
+  syncfusion_flutter_charts: ^26.1.38
+  syncfusion_flutter_pdf: ^26.1.38
+
+ 
+# dev_dependencies:
+#   flutter_test:
+#     sdk: flutter
+
+ 
 
 flutter:
 
@@ -44,6 +50,7 @@ flutter:
 
   assets:
     - asset/images/
+    - asset/fonts/
   #   - images/a_dot_ham.jpeg
   
 
@@ -54,6 +61,7 @@ flutter:
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
+  #        - assets/fonts/THSarabunNew.ttf
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:

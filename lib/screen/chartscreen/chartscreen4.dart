@@ -6,10 +6,11 @@ import 'package:intl/intl.dart';
 import '../../constants.dart';
 
 class _Chart extends StatelessWidget {
-  const _Chart({required this.isShowingMainData, required this.hourlyAverageSpots});
+  const _Chart(
+      {required this.isShowingMainData, required this.hourlyAverageSpots});
 
   final bool isShowingMainData;
-  final List<FlSpot> hourlyAverageSpots; // Add this line
+  final List<FlSpot> hourlyAverageSpots;
 
   @override
   Widget build(BuildContext context) {
@@ -19,12 +20,21 @@ class _Chart extends StatelessWidget {
           LineChartBarData(
             isCurved: true,
             curveSmoothness: 0,
-            color: kDefaultColor.withOpacity(0.5),
+            color: Colors.blue.withOpacity(1),
             barWidth: 4,
             isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) =>
+                  FlDotCirclePainter(
+                radius: 2,
+                color: Colors.red,
+                strokeWidth: 1,
+                strokeColor: Colors.red,
+              ),
+            ),
             belowBarData: BarAreaData(show: false),
-            spots: hourlyAverageSpots, // Update this line
+            spots: hourlyAverageSpots,
           ),
         ],
         titlesData: titlesData2,
@@ -32,7 +42,7 @@ class _Chart extends StatelessWidget {
         borderData: borderData,
         minX: 0,
         maxX: 23,
-        maxY: 40, // Adjust according to your data
+        maxY: 10,
         minY: 0,
       ),
     );
@@ -85,28 +95,43 @@ class _Chart extends StatelessWidget {
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: 14,
+      fontSize: 10,
     );
     String text;
     switch (value.toInt()) {
+      case 0: 
+        text = '0%';
+        break;
       case 1:
-        text = '10C';
+        text = '10%';
         break;
       case 2:
-        text = '15C';
+        text = '20%';
         break;
       case 3:
-        text = '20C';
+        text = '30%';
         break;
       case 4:
-        text = '25C';
+        text = '40%';
         break;
       case 5:
-        text = '30C';
+        text = '50%';
         break;
       case 6:
-        text = '35C';
+        text = '60%';
         break;
+      case 7:
+        text = '70%';
+        break;
+      case 8:
+        text = '80%';
+        break;
+      case 9:
+         text = '90%';
+         break;
+      case 10:
+         text = '100%';
+         break;
       default:
         return Container();
     }
@@ -118,36 +143,39 @@ class _Chart extends StatelessWidget {
         getTitlesWidget: leftTitleWidgets,
         showTitles: true,
         interval: 1,
-        reservedSize: 40,
+        reservedSize: 35,
       );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: 16,
+      fontSize: 11,
     );
     Widget text;
     switch (value.toInt()) {
-      case 1:
-        text = const Text('Mon', style: style);
+      case 0:
+        text = const Text('00:00', style: style);
         break;
       case 3:
-        text = const Text('Tue', style: style);
+        text = const Text('03:00', style: style);
         break;
-      case 5:
-        text = const Text('Wed', style: style);
-        break;
-      case 7:
-        text = const Text('Thu', style: style);
+      case 6:
+        text = const Text('06:00', style: style);
         break;
       case 9:
-        text = const Text('Fri', style: style);
+        text = const Text('09:00', style: style);
         break;
-      case 11:
-        text = const Text('Sat', style: style);
+      case 12:
+        text = const Text('12:00', style: style);
         break;
-      case 13:
-        text = const Text('Sun', style: style);
+      case 15:
+        text = const Text('15:00', style: style);
+        break;
+      case 18:
+        text = const Text('18:00', style: style);
+        break;
+      case 21:
+        text = const Text('21:00', style: style);
         break;
       default:
         text = const Text('');
@@ -170,11 +198,15 @@ class _Chart extends StatelessWidget {
 }
 
 class ChartBar4 extends StatefulWidget {
-  final DateTime? selectedDate; // Add this line
-  final String email; // Add this line
-  final String farmName; // Add this line
+  final DateTime? selectedDate;
+  final String email;
+  final String farmName;
 
-  const ChartBar4({super.key, this.selectedDate, required this.email, required this.farmName}); // Add this line
+  const ChartBar4(
+      {super.key,
+      this.selectedDate,
+      required this.email,
+      required this.farmName});
 
   @override
   State<StatefulWidget> createState() => ChartBar4State();
@@ -182,18 +214,16 @@ class ChartBar4 extends StatefulWidget {
 
 class ChartBar4State extends State<ChartBar4> {
   late bool isShowingMainData;
-  List<FlSpot> hourlyAverageSpots = []; // Add this line
+  List<FlSpot> hourlyAverageSpots = [];
 
   @override
   void initState() {
     super.initState();
     isShowingMainData = true;
-    if (widget.selectedDate != null) {
-      _fetchHourlyData(widget.selectedDate!, widget.email, widget.farmName); // Add this line
-    }
   }
 
-  Future<void> _fetchHourlyData(DateTime date, String email, String farmName) async {
+  Future<List<FlSpot>> _fetchHourlyData(
+      DateTime date, String email, String farmName) async {
     String dateStr = DateFormat('yyyy-M-d').format(date);
 
     CollectionReference environment = FirebaseFirestore.instance
@@ -204,7 +234,8 @@ class ChartBar4State extends State<ChartBar4> {
         .collection('environment');
 
     QuerySnapshot querySnapshot = await environment
-        .where(FieldPath.documentId, isGreaterThanOrEqualTo: '${dateStr}_00:00:00')
+        .where(FieldPath.documentId,
+            isGreaterThanOrEqualTo: '${dateStr}_00:00:00')
         .where(FieldPath.documentId, isLessThanOrEqualTo: '${dateStr}_23:59:59')
         .get();
 
@@ -216,23 +247,23 @@ class ChartBar4State extends State<ChartBar4> {
       String timeString = parts[1];
       int hour = int.parse(timeString.split(':')[0]);
 
-      double temperature = doc['temperature']; // Replace with actual field name
+      double soilmoisture = doc['soilmoisture'].toDouble();
 
       if (hourlyData[hour] == null) {
         hourlyData[hour] = [];
       }
-      hourlyData[hour]!.add(temperature);
+      hourlyData[hour]!.add(soilmoisture);
     }
 
-    List<FlSpot> spots = [];
-    hourlyData.forEach((hour, temps) {
-      double avgTemp = temps.reduce((a, b) => a + b) / temps.length;
-      spots.add(FlSpot(hour.toDouble(), avgTemp));
-    });
+   List<FlSpot> spots = [];
+  hourlyData.forEach((hour, temps) {
+    double avgTemp = temps.reduce((a, b) => a + b) / temps.length;
+    avgTemp = double.parse(
+        (avgTemp / 10).toStringAsFixed(2)); // ปรับสเกลและ Format เป็นทศนิยม 3 ตำแหน่ง
+    spots.add(FlSpot(hour.toDouble(), avgTemp));
+  });
 
-    setState(() {
-      hourlyAverageSpots = spots;
-    });
+    return spots;
   }
 
   @override
@@ -250,7 +281,23 @@ class ChartBar4State extends State<ChartBar4> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(right: 1, left: 1),
-                  child: _Chart(isShowingMainData: isShowingMainData, hourlyAverageSpots: hourlyAverageSpots), // Update this line
+                  child: FutureBuilder<List<FlSpot>>(
+                    future: widget.selectedDate != null
+                        ? _fetchHourlyData(
+                            widget.selectedDate!, widget.email, widget.farmName)
+                        : Future.value([]),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else {
+                        return _Chart(
+                            isShowingMainData: isShowingMainData,
+                            hourlyAverageSpots: snapshot.data!);
+                      }
+                    },
+                  ),
                 ),
               ),
             ],

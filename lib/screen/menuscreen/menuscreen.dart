@@ -62,8 +62,8 @@ class _MenuScreenState extends State<MenuScreen> {
                         ),
                       ),
                       SizedBox(
-                        width: 70,
-                        height: 70,
+                        width: 60,
+                        height: 60,
                         child: Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: Image.asset(
@@ -103,7 +103,7 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
           Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height / 1.12,
+            height: MediaQuery.of(context).size.height ,
             decoration: const BoxDecoration(
               color: kPrimaryColor,
               borderRadius: BorderRadius.only(
@@ -191,8 +191,8 @@ class _MenuScreenState extends State<MenuScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Image.asset(
             'asset/images/$image',
-            width: 30,
-            height: 30,
+            width: 25,
+            height: 25,
             color: Colors.black,
              // เพิ่มการปรับขนาดรูปในไอคอนสำหรับการ์ดที่ 5 และ 6
             scale: (index == 5 || index == 6) ? 1.0 : 1.0,

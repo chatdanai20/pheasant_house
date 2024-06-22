@@ -39,7 +39,7 @@ class _MainScreenState extends State<MainScreen> {
     initializeDateFormatting('th', null).then((_) {
       fetchHouseData();
     });
-    
+
     // Subscribe to the LDR stream to get real-time updates
     mqttHandler.ldrStream.listen((double ldrValue) {
       setState(() {
@@ -82,12 +82,14 @@ class _MainScreenState extends State<MainScreen> {
   String getThaiFormattedDate(DateTime date) {
     return DateFormat.yMMMMEEEEd('th').format(date);
   }
+
   @override
   void dispose() {
     // Dispose of the MqttHandler when the widget is disposed
     mqttHandler.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,212 +101,211 @@ class _MainScreenState extends State<MainScreen> {
             else
               Column(
                 children: [
-                  Column(
-                    children: [
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(top: 10, left: 10, right: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  icon: const Icon(Icons.arrow_back),
-                                ),
-                                SizedBox(
-                                  width: 80,
-                                  height: 80,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child:
-                                        Image.asset('asset/images/Logo2.png'),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Welcome',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      'To Pheasant House',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.arrow_back),
                             ),
-                            Row(
-                              children: [
-                                if (hasNotification)
-                                  Stack(
-                                    children: [
-                                      Icon(
-                                        Icons.notifications,
-                                        color: Colors.red,
-                                      ),
-                                      Positioned(
-                                        right: 0,
-                                        child: Container(
-                                          padding: EdgeInsets.all(1),
-                                          decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          constraints: BoxConstraints(
-                                            minWidth: 12,
-                                            minHeight: 12,
-                                          ),
-                                          child: Text(
-                                            '$_notificationCount',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 8,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                PopupMenuButton<String>(
-                                  onSelected: (String value) {
-                                    switch (value) {
-                                      case 'notification':
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                NotificationScreen(
-                                                    userEmail: _userEmail),
-                                          ),
-                                        ).then((_) {
-                                          setState(() {
-                                            hasNotification = false;
-                                            _notificationCount = 0;
-                                          });
-                                        });
-                                        break;
-                                      case 'information':
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const ProfileScreen(),
-                                          ),
-                                        );
-                                        break;
-                                      case 'logout':
-                                        FirebaseAuth.instance.signOut();
-                                        Navigator.pop(context);
-                                        break;
-                                    }
-                                  },
-                                  itemBuilder: (BuildContext context) =>
-                                      <PopupMenuEntry<String>>[
-                                    const PopupMenuItem<String>(
-                                      value: 'notification',
-                                      child: Text('Notification'),
-                                    ),
-                                    const PopupMenuItem<String>(
-                                      value: 'information',
-                                      child: Text('Profile'),
-                                    ),
-                                    const PopupMenuItem<String>(
-                                      value: 'logout',
-                                      child: Text('Logout'),
-                                    ),
-                                  ],
-                                  icon: Image.asset(
-                                    'asset/images/list.png',
-                                    width: 35,
-                                    height: 35,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * 0.75,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10,
-                              spreadRadius: 1,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 40, vertical: 20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.farmName,
-                                    style: const TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 5),
-                                    child: Text(
-                                      'วันนี้, ${getThaiFormattedDate(DateTime.now())}',
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(top: 5),
-                                    child: Text(
-                                      'ข้อมูลปัจจุบัน',
-                                      style: TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                            SizedBox(
+                              width: 70,
+                              height: 70,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Image.asset('asset/images/Logo2.png'),
                               ),
                             ),
-                            Padding(
+                            const SizedBox(width: 10),
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Welcome',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'To Pheasant House',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            if (hasNotification)
+                              Stack(
+                                children: [
+                                  Icon(
+                                    Icons.notifications,
+                                    color: Colors.red,
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    child: Container(
+                                      padding: EdgeInsets.all(1),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      constraints: BoxConstraints(
+                                        minWidth: 12,
+                                        minHeight: 12,
+                                      ),
+                                      child: Text(
+                                        '$_notificationCount',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            PopupMenuButton<String>(
+                              onSelected: (String value) {
+                                switch (value) {
+                                  case 'notification':
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            NotificationScreen(
+                                          userEmail: _userEmail,
+                                        ),
+                                      ),
+                                    ).then((_) {
+                                      setState(() {
+                                        hasNotification = false;
+                                        _notificationCount = 0;
+                                      });
+                                    });
+                                    break;
+                                  case 'information':
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ProfileScreen(),
+                                      ),
+                                    );
+                                    break;
+                                  case 'logout':
+                                    FirebaseAuth.instance.signOut();
+                                    Navigator.pop(context);
+                                    break;
+                                }
+                              },
+                              itemBuilder: (BuildContext context) =>
+                                  <PopupMenuEntry<String>>[
+                                const PopupMenuItem<String>(
+                                  value: 'notification',
+                                  child: Text('Notification'),
+                                ),
+                                const PopupMenuItem<String>(
+                                  value: 'information',
+                                  child: Text('Profile'),
+                                ),
+                                const PopupMenuItem<String>(
+                                  value: 'logout',
+                                  child: Text('Logout'),
+                                ),
+                              ],
+                              icon: Image.asset(
+                                'asset/images/list.png',
+                                width: 35,
+                                height: 35,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 10,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 20,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.farmName,
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'วันนี้, ${getThaiFormattedDate(DateTime.now())}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                const Text(
+                                  'ข้อมูลปัจจุบัน',
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 40),
+                                  const EdgeInsets.symmetric(horizontal: 35),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
                                   Expanded(
                                     child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Align(
                                           alignment: Alignment.bottomCenter,
@@ -324,19 +325,22 @@ class _MainScreenState extends State<MainScreen> {
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(height: 30),
+                                        const SizedBox(height: 5),
                                         Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  bottom:
-                                                      10), // Increase the bottom padding as needed
+                                                bottom: 10,
+                                              ),
                                               child: Text(
                                                 displayText,
                                                 style: const TextStyle(
                                                   fontSize: 24,
                                                   fontWeight: FontWeight.bold,
                                                 ),
+                                                textAlign: TextAlign.center,
                                               ),
                                             ),
                                             Text(
@@ -354,59 +358,61 @@ class _MainScreenState extends State<MainScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 20),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 30),
-                              child: SizedBox(
-                                height: 150,
-                                child: ListView(
-                                  scrollDirection: Axis.horizontal,
-                                  children: [
-                                    const SizedBox(width: 10),
-                                    _infoCard(
-                                        'ความเข้มแสง',
-                                        Icons.wb_sunny,
-                                        'ความเข้มแสง: ${houseData?['lux'] ?? 'N/A'} lux',
-                                        'asset/images/sun.png'),
-                                    const SizedBox(width: 10),
-                                    _infoCard(
-                                        'ความชื้นดิน',
-                                        Icons.opacity,
-                                        'ความชื้นดิน: ${houseData?['soilmoisture'] ?? 'N/A'} %',
-                                        'asset/images/soil.png'),
-                                    const SizedBox(width: 10),
-                                    _infoCard(
-                                        'ความชื้นอากาศ',
-                                        Icons.thermostat,
-                                        'ความชื้นอากาศ: ${houseData?['humidity'] ?? 'N/A'} %',
-                                        'asset/images/humidity.png'),
-                                    const SizedBox(width: 10),
-                                    _infoCard(
-                                        'แอมโมเนีย',
-                                        Icons.opacity,
-                                        'แอมโมเนีย: ${houseData?['ppm'] ?? 'N/A'} ppm',
-                                        'asset/images/ammonia.png'),
-                                    const SizedBox(width: 10),
-                                    _infoCard(
-                                        'อุณหภูมิ',
-                                        Icons.thermostat,
-                                        'อุณหภูมิ: ${houseData?['temperature'] ?? 'N/A'} °C',
-                                        'asset/images/temperature.png'),
-                                    const SizedBox(width: 10),
-                                    _infoCardGraph('ข้อมูลย้อนหลัง',
-                                        Icons.history, context),
-                                    const SizedBox(width: 10),
-                                    _infoCardWithNavigation(
-                                        'เมนูเพิ่มเติม', Icons.menu, context),
-                                    const SizedBox(width: 10),
-                                  ],
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            height: 150,
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: [
+                                const SizedBox(width: 10),
+                                _infoCard(
+                                  'ความเข้มแสง',
+                                  Icons.wb_sunny,
+                                  'ความเข้มแสง: ${houseData?['lux'] ?? 'N/A'} lux',
+                                  'asset/images/sun.png',
                                 ),
-                              ),
+                                const SizedBox(width: 10),
+                                _infoCard(
+                                  'ความชื้นดิน',
+                                  Icons.opacity,
+                                  'ความชื้นดิน: ${houseData?['soilmoisture'] ?? 'N/A'} %',
+                                  'asset/images/soil.png',
+                                ),
+                                const SizedBox(width: 10),
+                                _infoCard(
+                                  'ความชื้นอากาศ',
+                                  Icons.thermostat,
+                                  'ความชื้นอากาศ: ${houseData?['humidity'] ?? 'N/A'} %',
+                                  'asset/images/humidity.png',
+                                ),
+                                const SizedBox(width: 10),
+                                _infoCard(
+                                  'แอมโมเนีย',
+                                  Icons.opacity,
+                                  'แอมโมเนีย: ${houseData?['ppm'] ?? 'N/A'} ppm',
+                                  'asset/images/ammonia.png',
+                                ),
+                                const SizedBox(width: 10),
+                                _infoCard(
+                                  'อุณหภูมิ',
+                                  Icons.thermostat,
+                                  'อุณหภูมิ: ${houseData?['temperature'] ?? 'N/A'} °C',
+                                  'asset/images/temperature.png',
+                                ),
+                                const SizedBox(width: 10),
+                                _infoCardGraph(
+                                    'ข้อมูลย้อนหลัง', Icons.history, context),
+                                const SizedBox(width: 10),
+                                _infoCardWithNavigation(
+                                    'เมนูเพิ่มเติม', Icons.menu, context),
+                                const SizedBox(width: 10),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),

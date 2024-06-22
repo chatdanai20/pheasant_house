@@ -26,6 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+  bool _isPasswordVisible = false;
 
   String groupValue = 'yes';
 
@@ -116,20 +117,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           buildInputText(
-                              'Username', 'Your Username', usernameController),
+                              'ชื่อ', 'กรุณากรอกชื่อ', nameController),
+                          buildInputText('นามสกุล', 'กรุณากรอกนามสกุล',
+                              lastnameController),
                           buildInputText(
-                              'Password', 'Your Password', passwordController),
-                          buildInputText('Name', 'Your Name', nameController),
+                              'เพศ', 'กรุณากรอกเพศ', genderController),
                           buildInputText(
-                              'Lastname', 'Your Lastname', lastnameController),
+                              'Email', 'กรุณากรอกอีเมล', emailController),
+                          buildInputText('Password', 'กรุณาตั้งรหัสผ่าน',
+                              passwordController,
+                              isPassword: true),
                           buildInputText(
-                              'Gender', 'Your Gender', genderController),
+                              'ที่อยู่', 'กรุณากรอกที่อยู่', addressController),
                           buildInputText(
-                              'Email', 'Your Email', emailController),
-                          buildInputText(
-                              'Phone', 'Your Phone', phoneController),
-                          buildInputText(
-                              'Address', 'Your Address', addressController),
+                              'เบอร์โทร', 'กรุณาเบอร์โทร', phoneController),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
                             child: Row(
@@ -196,7 +197,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             .collection('User')
                                             .doc(newUser.email)
                                             .set({
-                                          'username': newUser.username,
                                           'name': newUser.name,
                                           'lastname': newUser.lastname,
                                           'gender': newUser.gender,
@@ -255,11 +255,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         });
   }
 
-  Widget buildInputText(
-      String name, String nameHint, TextEditingController controller) {
+    Widget buildInputText(
+      String name, String nameHint, TextEditingController controller,
+      {bool isPassword = false}) {
     // กำหนดค่าตั้งต้น
     TextInputType keyboardType = TextInputType.text;
-    bool obscureText = false;
+
     String? Function(String?)? validator;
     // ตรวจสอบค่าของ name
     if (name == 'Email') {
@@ -274,7 +275,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         return null;
       };
     } else if (name == 'Password') {
-      obscureText = true;
       validator = (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter your password';
@@ -284,17 +284,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
         if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^&\*])')
             .hasMatch(value)) {
-          return 'Password must include at least one uppercase letter, one lowercase letter,one number,and one special character';
+          return 'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character';
         }
         return null;
       };
     } else if (name == 'Phone') {
       validator = (value) {
         if (!RegExp(r'^(?=.*\d)').hasMatch(value!)) {
-          return 'Phone must include at number';
+          return 'Phone must include a number';
         }
         if (value.length < 10) {
-          return 'Phone must be at 10 characters';
+          return 'Phone must be at least 10 characters';
         }
         return null;
       };
@@ -303,10 +303,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (value == null || value.isEmpty) {
           return 'Please enter your $name';
         }
-
         return null;
       };
     }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -330,11 +330,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: TextFormField(
               controller: controller,
               keyboardType: keyboardType,
-              obscureText: obscureText,
+              obscureText: isPassword ? !_isPasswordVisible : false,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: nameHint,
                 hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                suffixIcon: isPassword
+                    ? IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      )
+                    : null,
               ),
               style: const TextStyle(
                 color: Colors.white,

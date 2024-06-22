@@ -22,11 +22,11 @@ class _DropdownCustomState extends State<DropdownCustom> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 100,
+      width: 120,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: const BoxDecoration(
         color: Color(0xFFD9D9D9),
-        borderRadius: BorderRadius.all(Radius.circular(14)),
+        borderRadius: BorderRadius.all(Radius.circular(115)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(

@@ -6,7 +6,8 @@ import 'package:intl/intl.dart';
 import '../../constants.dart';
 
 class _Chart extends StatelessWidget {
-  const _Chart({required this.isShowingMainData, required this.hourlyAverageSpots});
+  const _Chart(
+      {required this.isShowingMainData, required this.hourlyAverageSpots});
 
   final bool isShowingMainData;
   final List<FlSpot> hourlyAverageSpots;
@@ -19,18 +20,18 @@ class _Chart extends StatelessWidget {
           LineChartBarData(
             isCurved: true,
             curveSmoothness: 0,
-            color: kDefaultColor.withOpacity(0.5),
+            color: Colors.blue.withOpacity(1),
             barWidth: 4,
             isStrokeCapRound: true,
             dotData: FlDotData(
               show: true,
               getDotPainter: (spot, percent, barData, index) =>
-                FlDotCirclePainter(
-                  radius: 1,
-                  color: Colors.red,
-                  strokeWidth: 1,
-                  strokeColor: Colors.red,
-                ),
+                  FlDotCirclePainter(
+                radius: 2,
+                color: Colors.red,
+                strokeWidth: 1,
+                strokeColor: Colors.red,
+              ),
             ),
             belowBarData: BarAreaData(show: false),
             spots: hourlyAverageSpots,
@@ -41,8 +42,8 @@ class _Chart extends StatelessWidget {
         borderData: borderData,
         minX: 0,
         maxX: 23,
-        maxY: 45,
-        minY: 5,
+        maxY: 40,
+        minY: 0,
       ),
     );
   }
@@ -94,33 +95,37 @@ class _Chart extends StatelessWidget {
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: 14,
+      fontSize: 10,
     );
     String text;
     switch (value.toInt()) {
-  
+      case 5:
+        text = '500';
+        break;
       case 10:
-        text = '10C';
+        text = '1000';
         break;
       case 15:
-        text = '15C';
+        text = '1500';
         break;
       case 20:
-        text = '20C';
+        text = '2000';
         break;
       case 25:
-        text = '25C';
+        text = '2500';
         break;
       case 30:
-        text = '30C';
+        text = '3000';
         break;
       case 35:
-        text = '35C';
+        text = '3500';
         break;
       case 40:
-        text = '40C';
-        break;  
-    
+        text = '4000';
+        break;
+      // case 9:
+      //   text = '9000';
+      //   break;
       default:
         return Container();
     }
@@ -131,14 +136,14 @@ class _Chart extends StatelessWidget {
   SideTitles leftTitles() => SideTitles(
         getTitlesWidget: leftTitleWidgets,
         showTitles: true,
-        interval: 5,
+        interval: 1,
         reservedSize: 35,
       );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: 12,
+      fontSize: 11,
     );
     Widget text;
     switch (value.toInt()) {
@@ -191,7 +196,11 @@ class ChartBar1 extends StatefulWidget {
   final String email;
   final String farmName;
 
-  const ChartBar1({super.key, this.selectedDate, required this.email, required this.farmName});
+  const ChartBar1(
+      {super.key,
+      this.selectedDate,
+      required this.email,
+      required this.farmName});
 
   @override
   State<StatefulWidget> createState() => ChartBar1State();
@@ -205,12 +214,10 @@ class ChartBar1State extends State<ChartBar1> {
   void initState() {
     super.initState();
     isShowingMainData = true;
-    if (widget.selectedDate != null) {
-      _fetchHourlyData(widget.selectedDate!, widget.email, widget.farmName);
-    }
   }
 
-  Future<void> _fetchHourlyData(DateTime date, String email, String farmName) async {
+  Future<List<FlSpot>> _fetchHourlyData(
+      DateTime date, String email, String farmName) async {
     String dateStr = DateFormat('yyyy-M-d').format(date);
 
     CollectionReference environment = FirebaseFirestore.instance
@@ -221,7 +228,8 @@ class ChartBar1State extends State<ChartBar1> {
         .collection('environment');
 
     QuerySnapshot querySnapshot = await environment
-        .where(FieldPath.documentId, isGreaterThanOrEqualTo: '${dateStr}_00:00:00')
+        .where(FieldPath.documentId,
+            isGreaterThanOrEqualTo: '${dateStr}_00:00:00')
         .where(FieldPath.documentId, isLessThanOrEqualTo: '${dateStr}_23:59:59')
         .get();
 
@@ -233,24 +241,23 @@ class ChartBar1State extends State<ChartBar1> {
       String timeString = parts[1];
       int hour = int.parse(timeString.split(':')[0]);
 
-      double temperature = doc['temperature'];
+      double lux = doc['lux'].toDouble();
 
       if (hourlyData[hour] == null) {
         hourlyData[hour] = [];
       }
-      hourlyData[hour]!.add(temperature);
+      hourlyData[hour]!.add(lux);
     }
 
-    List<FlSpot> spots = [];
-    hourlyData.forEach((hour, temps) {
-      double avgTemp = temps.reduce((a, b) => a + b) / temps.length;
-      avgTemp = double.parse(avgTemp.toStringAsFixed(2)); // Format to 2 decimal places
-      spots.add(FlSpot(hour.toDouble(), avgTemp));
-    });
+   List<FlSpot> spots = [];
+  hourlyData.forEach((hour, luxValues) {
+    double avgLux = luxValues.reduce((a, b) => a + b) / luxValues.length;
+    avgLux = double.parse(
+        (avgLux / 100).toStringAsFixed(3)); // ปรับสเกลและ Format เป็นทศนิยม 3 ตำแหน่ง
+    spots.add(FlSpot(hour.toDouble(), avgLux));
+  });
 
-    setState(() {
-      hourlyAverageSpots = spots;
-    });
+    return spots;
   }
 
   @override
@@ -268,7 +275,23 @@ class ChartBar1State extends State<ChartBar1> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(right: 1, left: 1),
-                  child: _Chart(isShowingMainData: isShowingMainData, hourlyAverageSpots: hourlyAverageSpots),
+                  child: FutureBuilder<List<FlSpot>>(
+                    future: widget.selectedDate != null
+                        ? _fetchHourlyData(
+                            widget.selectedDate!, widget.email, widget.farmName)
+                        : Future.value([]),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else {
+                        return _Chart(
+                            isShowingMainData: isShowingMainData,
+                            hourlyAverageSpots: snapshot.data!);
+                      }
+                    },
+                  ),
                 ),
               ),
             ],

@@ -5,10 +5,10 @@ import 'package:pheasant_house/screen/functionMQTT.dart/mqtt.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 class CardHeat extends StatefulWidget {
-  const CardHeat({super.key});
+  const CardHeat({Key? key}) : super(key: key);
 
   @override
-  State<CardHeat> createState() => _CardHeatState();
+  _CardHeatState createState() => _CardHeatState();
 }
 
 class _CardHeatState extends State<CardHeat> {
@@ -32,17 +32,18 @@ class _CardHeatState extends State<CardHeat> {
     // Subscribe to the LDR stream to get real-time updates
     mqttHandler.ldrStream.listen((double ldrValue) {
       setState(() {
-        ldrValue = ldrValue;
+        // Handle updates here if needed
       });
     });
   }
+
   void switchToManualMode() {
     setState(() {
       isAutoMode = false;
     });
 
     // Check if MQTT client is connected before sending the command
-    if (mqttHandler.client.connectionStatus!.state ==
+    if (mqttHandler.client.connectionStatus?.state ==
         MqttConnectionState.connected) {
       mqttHandler.sendAutoModeCommand('esp32/auto_mode', 'manual');
     }
@@ -54,21 +55,21 @@ class _CardHeatState extends State<CardHeat> {
     });
 
     // Check if MQTT client is connected before sending the command
-    if (mqttHandler.client.connectionStatus!.state ==
+    if (mqttHandler.client.connectionStatus?.state ==
         MqttConnectionState.connected) {
       mqttHandler.sendAutoModeCommand('esp32/auto_mode', 'auto');
     }
   }
 
   void turnOnRelay1() {
-    if (mqttHandler.client.connectionStatus!.state ==
+    if (mqttHandler.client.connectionStatus?.state ==
         MqttConnectionState.connected) {
       mqttHandler.controlRelay('esp32/relay1', 'on');
     }
   }
 
   void turnOffRelay1() {
-    if (mqttHandler.client.connectionStatus!.state ==
+    if (mqttHandler.client.connectionStatus?.state ==
         MqttConnectionState.connected) {
       mqttHandler.controlRelay('esp32/relay1', 'off');
     }
@@ -85,8 +86,8 @@ class _CardHeatState extends State<CardHeat> {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width / 1.2,
-      height: MediaQuery.of(context).size.height / 1.5,
-      decoration: const BoxDecoration(
+      height: MediaQuery.of(context).size.height / 1.3,
+      decoration: BoxDecoration(
         color: Color(0xFFFFFFFF),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(40),
@@ -97,15 +98,14 @@ class _CardHeatState extends State<CardHeat> {
       ),
       child: Column(
         children: [
-          const SizedBox(
-            height: 10,
-          ),
-          Image.asset('asset/images/lamp.png'),
-          sizedBox,
+          SizedBox(height: 10),
+          Image.asset(
+              'asset/images/lamp.png'), // Adjust the asset path based on your project structure
+          SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'สถานะ : ',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -125,7 +125,7 @@ class _CardHeatState extends State<CardHeat> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'เปิด/ปิด : ',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -137,19 +137,16 @@ class _CardHeatState extends State<CardHeat> {
                 activeTrackColor: Colors.green[200],
                 inactiveTrackColor: Colors.red[200],
                 inactiveThumbColor: Colors.white,
-                autofocus: false,
                 value: isOpen,
                 onChanged: (value) {
-                  setState(
-                    () {
-                      isOpen = value;
-                      if (isOpen) {
-                        turnOnRelay1();
-                      } else {
-                        turnOffRelay1();
-                      }
-                    },
-                  );
+                  setState(() {
+                    isOpen = value;
+                    if (isOpen) {
+                      turnOnRelay1();
+                    } else {
+                      turnOffRelay1();
+                    }
+                  });
                 },
               ),
             ],
@@ -157,7 +154,7 @@ class _CardHeatState extends State<CardHeat> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'อัตโนมัติ : ',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -171,28 +168,24 @@ class _CardHeatState extends State<CardHeat> {
                 inactiveThumbColor: Colors.white,
                 value: isAuto,
                 onChanged: (value) {
-                  setState(
-                    () {
-                      isAuto = value;
-                      if (isAuto) {
-                        switchToAutoMode();
-                      } else {
-                        switchToManualMode();
-                      }
-                    },
-                  );
+                  setState(() {
+                    isAuto = value;
+                    if (isAuto) {
+                      switchToAutoMode();
+                    } else {
+                      switchToManualMode();
+                    }
+                  });
                 },
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 10),
           ElevatedButton(
             style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFF00BFA5))),
-            child: const Text(
+              backgroundColor: MaterialStateProperty.all(Color(0xFF00BFA5)),
+            ),
+            child: Text(
               'ตั้งค่าการทำงานอัตโนมัติ',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
@@ -211,7 +204,9 @@ class _CardHeatState extends State<CardHeat> {
                                 initialItem: selectedItem),
                             onSelectedItemChanged: onChanged,
                             children: List<Widget>.generate(
-                                count, (int index) => Text('$index')),
+                              count,
+                              (int index) => Text('$index'),
+                            ),
                           ),
                         );
                       }
@@ -230,10 +225,11 @@ class _CardHeatState extends State<CardHeat> {
                                   children: [
                                     ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  const Color(0xFF6FC0C5))),
-                                      child: const Text(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                Color(0xFF6FC0C5)),
+                                      ),
+                                      child: Text(
                                         'กลับ',
                                         style: TextStyle(color: Colors.white),
                                       ),
@@ -241,10 +237,11 @@ class _CardHeatState extends State<CardHeat> {
                                     ),
                                     ElevatedButton(
                                       style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  const Color(0xFF6FC0C5))),
-                                      child: const Text(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                Color(0xFF6FC0C5)),
+                                      ),
+                                      child: Text(
                                         'บันทึก',
                                         style: TextStyle(color: Colors.white),
                                       ),
@@ -255,65 +252,81 @@ class _CardHeatState extends State<CardHeat> {
                                           closingTimeMessage =
                                               '${selectedCloseHour}:${selectedCloseMinute}';
                                         });
+
+                                        String openingTimeToSend =
+                                            selectedOpenHour != 0 ||
+                                                    selectedOpenMinute != 0
+                                                ? '${selectedOpenHour}:${selectedOpenMinute}'
+                                                : 'null';
+
+                                        String closingTimeToSend =
+                                            selectedCloseHour != 0 ||
+                                                    selectedCloseMinute != 0
+                                                ? '${selectedCloseHour}:${selectedCloseMinute}'
+                                                : 'null';
+
+                                        String sensorOpenToSend =
+                                            sensorOpenController.text.isNotEmpty
+                                                ? sensorOpenController.text
+                                                : 'null';
+
+                                        String sensorCloseToSend =
+                                            sensorCloseController
+                                                    .text.isNotEmpty
+                                                ? sensorCloseController.text
+                                                : 'null';
+
                                         mqttHandler.sendSensorValue(
-                                            'esp32/minldr',
-                                            sensorOpenController.text);
+                                            'esp32/minldr', sensorOpenToSend);
                                         mqttHandler.sendSensorValue(
-                                            'esp32/maxldr',
-                                            sensorCloseController.text);
+                                            'esp32/maxldr', sensorCloseToSend);
                                         mqttHandler.sendAutoModeCommand(
-                                            'esp32/lighton',
-                                            openingTimeMessage);
+                                            'esp32/lighton', openingTimeToSend);
                                         mqttHandler.sendAutoModeCommand(
                                             'esp32/lightoff',
-                                            closingTimeMessage);
+                                            closingTimeToSend);
+
                                         Navigator.pop(context);
                                       },
                                     ),
                                   ],
                                 ),
                               ),
-                              buildInputText('ค่าเซนเซอร์เปิด ', 'อุณหภูมิ',
+                              buildInputText('ค่าเซนเซอร์เปิด', 'ความเข้มเเสง',
                                   sensorOpenController),
-                              buildInputText('ค่าเซนเซอร์ปิด ', 'อุณหภูมิ',
+                              buildInputText('ค่าเซนเซอร์ปิด', 'ความเข้ม',
                                   sensorCloseController),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Text(
+                              SizedBox(height: 10),
+                              Text(
                                 'เวลาเปิด',
                                 style: TextStyle(
                                     color: Color(0xFF6FC0C5), fontSize: 16),
                               ),
-                              const SizedBox(
-                                height: 10,
-                              ),
+                              SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   buildPicker(
-                                      24,
-                                      selectedOpenHour,
-                                      (int newVal) => setState(
-                                          () => selectedOpenHour = newVal)),
+                                    24,
+                                    selectedOpenHour,
+                                    (int newVal) => setState(
+                                        () => selectedOpenHour = newVal),
+                                  ),
                                   buildPicker(
-                                      60,
-                                      selectedOpenMinute,
-                                      (int newVal) => setState(
-                                          () => selectedOpenMinute = newVal)),
+                                    60,
+                                    selectedOpenMinute,
+                                    (int newVal) => setState(
+                                        () => selectedOpenMinute = newVal),
+                                  ),
                                 ],
                               ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Text(
+                              SizedBox(height: 10),
+                              Text(
                                 'เวลาปิด',
                                 style: TextStyle(
                                     color: Color(0xFF6FC0C5), fontSize: 16),
                               ),
-                              const SizedBox(
-                                height: 10,
-                              ),
+                              SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -328,9 +341,14 @@ class _CardHeatState extends State<CardHeat> {
                                     selectedCloseMinute,
                                     (int newVal) => setState(
                                         () => selectedCloseMinute = newVal),
-                                  ),
+                                  )
                                 ],
                               ),
+                              SizedBox(height: 20),
+                              // Displaying sensor values for testing
+                              Text('Sensor Open: ${sensorOpenController.text}'),
+                              Text(
+                                  'Sensor Close: ${sensorCloseController.text}'),
                             ],
                           ),
                         ),
@@ -341,10 +359,8 @@ class _CardHeatState extends State<CardHeat> {
               );
             },
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -356,7 +372,9 @@ class _CardHeatState extends State<CardHeat> {
                 ),
               ),
               Text(
-                ' 40 °C',
+                sensorOpenController.text.isNotEmpty
+                    ? ' ${sensorOpenController.text} °C'
+                    : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -365,10 +383,8 @@ class _CardHeatState extends State<CardHeat> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -380,7 +396,9 @@ class _CardHeatState extends State<CardHeat> {
                 ),
               ),
               Text(
-                ' 25 °C',
+                sensorCloseController.text.isNotEmpty
+                    ? ' ${sensorCloseController.text} °C'
+                    : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -389,10 +407,8 @@ class _CardHeatState extends State<CardHeat> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -404,7 +420,7 @@ class _CardHeatState extends State<CardHeat> {
                 ),
               ),
               Text(
-                '',
+                openingTimeMessage != 'null' ? ' $openingTimeMessage' : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -413,13 +429,10 @@ class _CardHeatState extends State<CardHeat> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Row(
+          SizedBox(height: 10),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Text widget for displaying the label "เวลาเปิด"
               Text(
                 'เวลาปิด ',
                 style: TextStyle(
@@ -428,9 +441,8 @@ class _CardHeatState extends State<CardHeat> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              // Text widget for displaying the opening time
               Text(
-                '',
+                closingTimeMessage != 'null' ? ' $closingTimeMessage' : ' null',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -457,7 +469,7 @@ Widget buildInputText(
         padding: const EdgeInsets.only(left: 30),
         child: Text(
           name,
-          style: const TextStyle(color: Color(0xFF6FC0C5), fontSize: 16),
+          style: TextStyle(color: Color(0xFF6FC0C5), fontSize: 16),
         ),
       ),
       Padding(
@@ -466,7 +478,7 @@ Widget buildInputText(
           width: 330.0,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: const Color(0xFF6FC0C5),
+            color: Color(0xFF6FC0C5),
             borderRadius: BorderRadius.circular(20),
           ),
           child: TextField(
@@ -476,7 +488,7 @@ Widget buildInputText(
               hintText: nameHint,
               hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
             ),
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 16,
             ),

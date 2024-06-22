@@ -24,7 +24,7 @@ class _WelcomescreenState extends State<Welcomescreen> {
                 Container(
                   margin: const EdgeInsets.only(bottom: 50),
                   width: 330,
-                  height: 250,
+                  height: 200,
                   child: Image.asset(
                     'asset/images/Logo2.png',
                   ),
@@ -34,7 +34,7 @@ class _WelcomescreenState extends State<Welcomescreen> {
                     Container(
                       margin: const EdgeInsets.only(bottom: 50),
                       width: 330,
-                      height: 280,
+                      height: 200,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(100),
                       ),
