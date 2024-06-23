@@ -10,6 +10,7 @@ import 'package:pheasant_house/screen/chartscreen/chartscreen2.dart';
 import 'package:pheasant_house/screen/chartscreen/chartscreen3.dart';
 import 'package:pheasant_house/screen/chartscreen/chartscreen4.dart';
 import 'package:pheasant_house/screen/chartscreen/chartscreen5.dart';
+import 'package:pheasant_house/screen/functionMQTT.dart/creatdata.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'dart:io';
 import '../../constants.dart';
@@ -27,6 +28,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart'; // เพิ่มการนำเข้าแพ็คเกจ intl
 import 'package:intl/date_symbol_data_local.dart'; // เพิ่มการนำเข้า date_symbol_data_local
+import 'package:pheasant_house/screen/chartscreen/chartpdf.dart';
 
 class ChartScreen extends StatefulWidget {
   final String farmName;
@@ -53,6 +55,7 @@ class ChartScreenState extends State<ChartScreen> {
     super.initState();
     _fetchData();
     _fetchUniqueMonths();
+    this.environmentData = environmentData;
   }
 
   @override
@@ -164,7 +167,6 @@ class ChartScreenState extends State<ChartScreen> {
     return Column(
       children: [
         Padding(
-          
           padding: const EdgeInsets.only(top: 15),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -384,126 +386,123 @@ class ChartScreenState extends State<ChartScreen> {
     });
   }
 
-  Future<List<Map<String, dynamic>>> _fetchDatapdf(String monthYear) async {
-    String userEmail = widget.email;
-    String farmName = widget.farmName;
+  Future<List<Map<String, dynamic>>> fetchDatapdf(String monthYear) async {
+  String userEmail = widget.email;
+  String farmName = widget.farmName;
 
-    CollectionReference environment = FirebaseFirestore.instance
-        .collection('User')
-        .doc(userEmail)
-        .collection('farm')
-        .doc(farmName)
-        .collection('environment');
+  CollectionReference environment = FirebaseFirestore.instance
+      .collection('User')
+      .doc(userEmail)
+      .collection('farm')
+      .doc(farmName)
+      .collection('environment');
 
-    // Create a DateTime range for the selected month/year
-    DateTime startOfMonth = DateFormat('MM/yyyy').parse(monthYear);
-    DateTime endOfMonth =
-        DateTime(startOfMonth.year, startOfMonth.month + 1, 0);
+  // Parse monthYear to DateTime
+  DateTime selectedMonth = DateFormat('MM/yyyy').parse(monthYear);
 
-    QuerySnapshot querySnapshot = await environment
-        .where(FieldPath.documentId,
-            isGreaterThanOrEqualTo:
-                DateFormat('yyyy-MM-dd').format(startOfMonth))
-        .where(FieldPath.documentId,
-            isLessThanOrEqualTo: DateFormat('yyyy-MM-dd').format(endOfMonth))
-        .get();
+  // Determine start and end date of the month
+  DateTime startOfMonth = DateTime(selectedMonth.year, selectedMonth.month, 1);
+  DateTime endOfMonth = DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
 
-    Map<String, Map<String, dynamic>> dailyData = {};
+  // Format dates for querying Firestore
+  String startDateString = DateFormat('yyyy-MM-dd').format(startOfMonth);
+  String endDateString = DateFormat('yyyy-MM-dd').format(endOfMonth);
 
-    for (var doc in querySnapshot.docs) {
-      if (doc.id != 'now') {
-        List<String> parts = doc.id.split('_');
-        String dateString = parts[0];
-        DateTime dateTime;
-        try {
-          dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
-        } catch (e) {
-          print('Error parsing date: $dateString');
-          print(e);
-          continue;
-        }
+  // Query Firestore for documents within the specified month
+  QuerySnapshot querySnapshot = await environment
+      .where(FieldPath.documentId, isGreaterThanOrEqualTo: startDateString)
+      .where(FieldPath.documentId, isLessThanOrEqualTo: endDateString)
+      .get();
 
-        String timeString = parts.length > 1 ? parts[1] : '00:00:00';
-        DateTime time;
-        try {
-          time = DateFormat('HH:mm:ss').parse(timeString);
-        } catch (e) {
-          print('Error parsing time: $timeString');
-          print(e);
-          continue;
-        }
+  // Map to store daily data averages
+  Map<String, Map<String, List<double>>> dailyData = {};
 
-        if (!dailyData.containsKey(dateString)) {
-          dailyData[dateString] = {
-            'lux_morning': [],
-            'lux_noon': [],
-            'lux_evening': [],
-            'temperature': [],
-            'humidity': [],
-            'soilmoisture': [],
-            'ppm': [],
-            'ammonia': []
-          };
-        }
+  // Iterate through query results and calculate daily averages
+  for (var doc in querySnapshot.docs) {
+    String docId = doc.id;
+    List<String> parts = docId.split('_');
+    String dateString = parts[0];
+    DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
 
-        Map<String, dynamic> dayData = dailyData[dateString]!;
-        double lux = doc['lux'] ?? 0;
-        double temperature = doc['temperature'] ?? 0.0;
-        double humidity = doc['humidity'] ?? 0.0;
-        double soilMoisture = doc['soilmoisture'] ?? 0.0;
-        double ppm = doc['ppm'] ?? 0;
-        double ammonia = doc['ammonia'] ?? 0;
-
-        if (time.hour >= 7 && time.hour < 11) {
-          dayData['lux_morning'].add(lux);
-        } else if (time.hour >= 11 && time.hour < 15) {
-          dayData['lux_noon'].add(lux);
-        } else if (time.hour >= 15 && time.hour < 17) {
-          dayData['lux_evening'].add(lux);
-        }
-
-        dayData['temperature'].add(temperature);
-        dayData['humidity'].add(humidity);
-        dayData['soilmoisture'].add(soilMoisture);
-        dayData['ppm'].add(ppm);
-        dayData['ammonia'].add(ammonia);
-      }
+    // Skip documents with docId 'now' or dates outside selected month
+    if (docId == 'now' || dateTime.isBefore(startOfMonth) || dateTime.isAfter(endOfMonth)) {
+      continue;
     }
 
-    List<Map<String, dynamic>> environmentData = [];
+    String timeString = parts.length > 1 ? parts[1] : '00:00:00';
+    DateTime time = DateFormat('HH:mm:ss').parse(timeString);
 
-    dailyData.forEach((date, dayData) {
-      double luxMorningAvg = _calculateAverage(dayData['lux_morning']) / 1000;
-      double luxNoonAvg = _calculateAverage(dayData['lux_noon']) / 1000;
-      double luxEveningAvg = _calculateAverage(dayData['lux_evening']) / 1000;
-      double tempAvg = _calculateAverage(dayData['temperature']) / 10;
-      double humidityAvg = _calculateAverage(dayData['humidity']) / 10;
-      double soilMoistureAvg = _calculateAverage(dayData['soilmoisture']) / 10;
-      double ppmAvg = _calculateAverage(dayData['ppm']) / 10;
-      double ammoniaAvg =
-          _calculateAverage(dayData['ammonia']); // No scaling for ammonia
+    // Initialize dailyData entry if not exists
+    if (!dailyData.containsKey(dateString)) {
+      dailyData[dateString] = {
+        'lux_morning': [],
+        'lux_noon': [],
+        'lux_evening': [],
+        'temperature': [],
+        'humidity': [],
+        'soilmoisture': [],
+        'ppm': [],
+      };
+    }
 
-      environmentData.add({
-        'docId': date,
-        'lux_morning': luxMorningAvg,
-        'lux_noon': luxNoonAvg,
-        'lux_evening': luxEveningAvg,
-        'temperature': tempAvg,
-        'humidity': humidityAvg,
-        'soilmoisture': soilMoistureAvg,
-        'ppm': ppmAvg,
-        'ammonia': ammoniaAvg,
-      });
+    Map<String, List<double>> dayData = dailyData[dateString]!;
+    int lux = doc['lux'] ?? 0;
+    double temperature = doc['temperature'] ?? 0.0;
+    double humidity = doc['humidity'] ?? 0.0;
+    double soilMoisture = doc['soilmoisture'] ?? 0.0;
+    double ppm = doc['ppm'] ?? 0;
+
+    // Assign lux to appropriate time slot in dayData
+    if (time.hour >= 7 && time.hour < 11) {
+      dayData['lux_morning']!.add(lux.toDouble());
+    } else if (time.hour >= 11 && time.hour < 15) {
+      dayData['lux_noon']!.add(lux.toDouble());
+    } else if (time.hour >= 15 && time.hour < 17) {
+      dayData['lux_evening']!.add(lux.toDouble());
+    }
+
+    // Add temperature, humidity, soil moisture, ppm to dayData
+    dayData['temperature']!.add(temperature);
+    dayData['humidity']!.add(humidity);
+    dayData['soilmoisture']!.add(soilMoisture);
+    dayData['ppm']!.add(ppm);
+  }
+
+  // List to store averaged environment data for each day in the month
+  List<Map<String, dynamic>> environmentData = [];
+
+  // Calculate averages and format data for each day in dailyData
+  dailyData.forEach((date, dayData) {
+    double luxMorningAvg = _calculateAverage(dayData['lux_morning']!);
+    double luxNoonAvg = _calculateAverage(dayData['lux_noon']!);
+    double luxEveningAvg = _calculateAverage(dayData['lux_evening']!);
+    double tempAvg = _calculateAverage(dayData['temperature']!) / 10;
+    double humidityAvg = _calculateAverage(dayData['humidity']!) / 10;
+    double soilMoistureAvg = _calculateAverage(dayData['soilmoisture']!) / 10;
+    double ppmAvg = _calculateAverage(dayData['ppm']!);
+
+    // Format data for each day and add to environmentData list
+    environmentData.add({
+      'docId': date,
+      'lux_morning': luxMorningAvg,
+      'lux_noon': luxNoonAvg,
+      'lux_evening': luxEveningAvg,
+      'temperature': tempAvg,
+      'humidity': humidityAvg,
+      'soilmoisture': soilMoistureAvg,
+      'ppm': ppmAvg,
     });
+  });
 
-    return environmentData;
-  }
+  return environmentData;
+}
 
-  double _calculateAverage(List<double> values) {
-    if (values.isEmpty) return 0.0;
-    double sum = values.reduce((a, b) => a + b);
-    return sum / values.length;
-  }
+// Function to calculate average of a list of doubles
+double _calculateAverage(List<double> values) {
+  if (values.isEmpty) return 0.0;
+  double sum = values.reduce((a, b) => a + b);
+  return sum / values.length;
+}
 
   Future<void> _showDateSelectionDialog(BuildContext context) async {
     await showDialog(
@@ -560,11 +559,22 @@ class ChartScreenState extends State<ChartScreen> {
                 return ListTile(
                   title: Text(uniqueMonths[index]),
                   onTap: () async {
-                    setState(() {
-                      selectedMonthYear = uniqueMonths[index];
-                    });
+                    selectedMonthYear = uniqueMonths[index];
                     Navigator.of(context).pop();
-                    //await _createPdf(selectedMonthYear);
+                    fetchDatapdf(selectedMonthYear!);
+                    print('${environmentData}');
+                    // Navigate to _ChartApp screen here
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => chartpdf(
+                          selectedMonthYear: selectedMonthYear!,
+                          userEmail: widget.email,
+                          farmName: widget.farmName,
+                          environmentData: environmentData,
+                        ),
+                      ),
+                    );
                   },
                 );
               },
@@ -698,9 +708,11 @@ class ChartScreenState extends State<ChartScreen> {
     DocumentSnapshot<Map<String, dynamic>> userData =
         await FirebaseFirestore.instance.collection('User').doc(username).get();
 
-     DateTime now = DateTime.now();
-     String formattedDate = DateFormat.yMMMM('th_TH').format(DateTime(now.year + 543, now.month, now.day)); // ใช้ DateFormat ภาษาไทยและเพิ่ม 543 ปี
-
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat.yMMMM('th_TH').format(DateTime(
+        now.year + 543,
+        now.month,
+        now.day)); // ใช้ DateFormat ภาษาไทยและเพิ่ม 543 ปี
 
     pdf.addPage(
       pw.Page(

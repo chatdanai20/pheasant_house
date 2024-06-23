@@ -4,6 +4,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:pheasant_house/constants.dart';
 import 'package:pheasant_house/screen/welcome/welcome.dart';
 import 'package:pheasant_house/screen/functionMQTT.dart/mqtt.dart';
+import 'package:provider/provider.dart';
+import 'screen/chartscreen/environmentpovider.dart'; // อย่าลืมเปลี่ยนเป็น path ที่ถูกต้อง
 
 void main() {
   // Initialize date formatting once
@@ -27,13 +29,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        textTheme: GoogleFonts.promptTextTheme(),
-        scaffoldBackgroundColor: kDefaultColor,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => EnvironmentDataProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          textTheme: GoogleFonts.promptTextTheme(),
+          scaffoldBackgroundColor: kDefaultColor,
+        ),
+        home: const Welcomescreen(),
       ),
-      home: const Welcomescreen(),
     );
   }
 }

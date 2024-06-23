@@ -507,8 +507,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _addNewHouse() async {
     final TextEditingController _houseNameController = TextEditingController();
-    final TextEditingController _mqttServerController = TextEditingController();
-    final TextEditingController _mqttClientController = TextEditingController();
+    // final TextEditingController _mqttServerController = TextEditingController();
+    // final TextEditingController _mqttClientController = TextEditingController();
 
     await showDialog(
       context: context,
@@ -523,18 +523,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 hintText: 'Enter house name',
               ),
             ),
-            TextField(
-              controller: _mqttServerController,
-              decoration: const InputDecoration(
-                hintText: 'Enter MQTT server',
-              ),
-            ),
-            TextField(
-              controller: _mqttClientController,
-              decoration: const InputDecoration(
-                hintText: 'Enter MQTT client',
-              ),
-            ),
+            // TextField(
+            //   controller: _mqttServerController,
+            //   decoration: const InputDecoration(
+            //     hintText: 'Enter MQTT server',
+            //   ),
+            // ),
+            // TextField(
+            //   controller: _mqttClientController,
+            //   decoration: const InputDecoration(
+            //     hintText: 'Enter MQTT client',
+            //   ),
+            // ),
           ],
         ),
         actions: [
@@ -547,12 +547,12 @@ class _HomeScreenState extends State<HomeScreen> {
           TextButton(
             onPressed: () async {
               String houseName = _houseNameController.text;
-              String mqttServer = _mqttServerController.text;
-              String mqttClient = _mqttClientController.text;
-
-              if (houseName.isNotEmpty &&
-                  mqttServer.isNotEmpty &&
-                  mqttClient.isNotEmpty) {
+              // String mqttServer = _mqttServerController.text;
+              // String mqttClient = _mqttClientController.text;
+              // if (houseName.isNotEmpty &&
+              //     mqttServer.isNotEmpty &&
+              //     mqttClient.isNotEmpty)
+              if (houseName.isNotEmpty) {
                 var houseCollection = FirebaseFirestore.instance
                     .collection('User')
                     .doc(_userEmail)
@@ -569,8 +569,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else {
                   await houseCollection.doc(houseName).set({
                     'farm_name': houseName,
-                    'mqtt_server': mqttServer,
-                    'mqtt_client': mqttClient,
+                    // 'mqtt_server': mqttServer,
+                    // 'mqtt_client': mqttClient,
                   });
                   Navigator.pop(context);
                 }
