@@ -219,6 +219,7 @@ class ChartBar1State extends State<ChartBar1> {
   Future<List<FlSpot>> _fetchHourlyData(
       DateTime date, String email, String farmName) async {
     String dateStr = DateFormat('yyyy-M-d').format(date);
+    // print(date);
 
     CollectionReference environment = FirebaseFirestore.instance
         .collection('User')
@@ -226,12 +227,15 @@ class ChartBar1State extends State<ChartBar1> {
         .collection('farm')
         .doc(farmName)
         .collection('environment');
+    // print(environment);
 
     QuerySnapshot querySnapshot = await environment
         .where(FieldPath.documentId,
             isGreaterThanOrEqualTo: '${dateStr}_00:00:00')
         .where(FieldPath.documentId, isLessThanOrEqualTo: '${dateStr}_23:59:59')
         .get();
+
+    print(querySnapshot.docs[0].id);
 
     Map<int, List<double>> hourlyData = {};
 
@@ -243,19 +247,22 @@ class ChartBar1State extends State<ChartBar1> {
 
       double lux = doc['lux'].toDouble();
 
+      print(lux);
+
       if (hourlyData[hour] == null) {
         hourlyData[hour] = [];
       }
       hourlyData[hour]!.add(lux);
     }
 
-   List<FlSpot> spots = [];
-  hourlyData.forEach((hour, luxValues) {
-    double avgLux = luxValues.reduce((a, b) => a + b) / luxValues.length;
-    avgLux = double.parse(
-        (avgLux / 100).toStringAsFixed(3)); // ปรับสเกลและ Format เป็นทศนิยม 3 ตำแหน่ง
-    spots.add(FlSpot(hour.toDouble(), avgLux));
-  });
+    List<FlSpot> spots = [];
+    hourlyData.forEach((hour, luxValues) {
+      double avgLux = luxValues.reduce((a, b) => a + b) / luxValues.length;
+      avgLux = double.parse((avgLux / 100)
+          .toStringAsFixed(3)); // ปรับสเกลและ Format เป็นทศนิยม 3 ตำแหน่ง
+      spots.add(FlSpot(hour.toDouble(), avgLux));
+    });
+    // print(spots);
 
     return spots;
   }
