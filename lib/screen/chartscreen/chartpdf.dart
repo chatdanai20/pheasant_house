@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:pheasant_house/constants.dart';
 import 'package:pheasant_house/screen/homescreen/homescreen.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -51,12 +52,7 @@ class ChartPdfState extends State<ChartPdf> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomeScreen(),
-              ),
-            );
+            Navigator.pop(context);
           },
         ),
       ),
@@ -149,7 +145,8 @@ class ChartPdfState extends State<ChartPdf> {
 
   Future<void> generatePDF(BuildContext context) async {
     final pdf = pw.Document();
-
+    Color flutterColor1 = Color.fromARGB(255, 237, 177, 197);  
+    
     final fontData = await loadFont('asset/fonts/THSarabunNew.ttf');
     final ttf = pw.Font.ttf(ByteData.sublistView(fontData));
 
@@ -194,7 +191,136 @@ class ChartPdfState extends State<ChartPdf> {
               ),
               pw.Center(
                 child:
-                    pw.Image(pw.MemoryImage(bytes), width: 5000, height: 460),
+                    pw.Image(pw.MemoryImage(bytes), width: 5000, height: 435),
+              ),
+              pw.Positioned(
+                right: 0,
+                top: 200,
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Row(
+                      children: [
+                        pw.Container(
+                          width: 10,
+                          height: 10,
+                          decoration: pw.BoxDecoration(
+                            color: PdfColor.fromInt(0xffedb1c5), // Blue dot
+                            shape: pw.BoxShape.circle,
+                          ),
+                        ),
+                        pw.SizedBox(width: 5),
+                        pw.Text(
+                          'แอมโมเนีย 1:1',
+                          style: pw.TextStyle(font: ttf, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    pw.Row(
+                      children: [
+                        pw.Container(
+                          width: 10,
+                          height: 10,
+                          decoration: pw.BoxDecoration(
+                            color: PdfColor.fromInt(0xff0000ff), // Red dot
+                            shape: pw.BoxShape.circle,
+                          ),
+                        ),
+                        pw.SizedBox(width: 5),
+                        pw.Text(
+                          'แสงช่วงเช้า 1:1000',
+                          style: pw.TextStyle(font: ttf, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    pw.Row(
+                      children: [
+                        pw.Container(
+                          width: 10,
+                          height: 10,
+                          decoration: pw.BoxDecoration(
+                            color: PdfColor.fromInt(0xffffa500), // Green dot
+                            shape: pw.BoxShape.circle,
+                          ),
+                        ),
+                        pw.SizedBox(width: 5),
+                        pw.Text(
+                          'แสงช่วงเที่ยง 1:1000',
+                          style: pw.TextStyle(font: ttf, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    // Add more rows as needed
+                     pw.Row(
+                      children: [
+                        pw.Container(
+                          width: 10,
+                          height: 10,
+                          decoration: pw.BoxDecoration(
+                            color: PdfColor.fromInt(0x0cbc3bff), // Red dot
+                            shape: pw.BoxShape.circle,
+                          ),
+                        ),
+                        pw.SizedBox(width: 5),
+                        pw.Text(
+                          'แสงช่วงบ่าย 1:1000',
+                          style: pw.TextStyle(font: ttf, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                     pw.Row(
+                      children: [
+                        pw.Container(
+                          width: 10,
+                          height: 10,
+                          decoration: pw.BoxDecoration(
+                            color: PdfColor.fromInt(0xffff0000), // Red dot
+                            shape: pw.BoxShape.circle,
+                          ),
+                        ),
+                        pw.SizedBox(width: 5),
+                        pw.Text(
+                          'อุณหภูมิ 1:1',
+                          style: pw.TextStyle(font: ttf, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                     pw.Row(
+                      children: [
+                        pw.Container(
+                          width: 10,
+                          height: 10,
+                          decoration: pw.BoxDecoration(
+                            color: PdfColor.fromInt(0xff00ff00), // Red dot
+                            shape: pw.BoxShape.circle,
+                          ),
+                        ),
+                        pw.SizedBox(width: 5),
+                        pw.Text(
+                          'ความชื้นอากาศ 1:10',
+                          style: pw.TextStyle(font: ttf, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                     pw.Row(
+                      children: [
+                        pw.Container(
+                          width: 10,
+                          height: 10,
+                          decoration: pw.BoxDecoration(
+                            color: PdfColor.fromInt(0xffffa500), // Red dot
+                            shape: pw.BoxShape.circle,
+                          ),
+                        ),
+                        pw.SizedBox(width: 5),
+                        pw.Text(
+                          'ความชื้นดิน 1:10',
+                          style: pw.TextStyle(font: ttf, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               pw.Positioned(
                 bottom: 20,
@@ -299,32 +425,39 @@ class ChartPdfState extends State<ChartPdf> {
   Future<String> savePdf(pw.Document pdf, BuildContext context) async {
     String path;
     late File file;
-
-    if (Platform.isAndroid) {
-      path = (await getExternalStorageDirectory())!.path;
-      file = File("$path/best_pdf.pdf");
-    } else if (Platform.isIOS) {
-      path = (await getApplicationDocumentsDirectory()).path;
-      Directory directory = await Directory("$path/best_pdfs").create();
-      file = File("${directory.path}/best_pdf.pdf");
-    } else {
-      throw UnsupportedError("Unsupported platform");
-    }
-
-    if (await file.exists()) {
-      try {
-        await file.delete();
-      } on Exception catch (e) {
-        print(e);
-      }
-    }
-
-    await file.writeAsBytes(await pdf.save());
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('PDF saved at ${file.path}')),
-    );
-    return file.path;
+    
+    
+  // Determine platform-specific directory
+  if (Platform.isAndroid) {
+    path = (await getExternalStorageDirectory())!.path;
+    file = File("$path/best1_pdf_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf"); // Include today's date in Android file name
+  } else if (Platform.isIOS) {
+    path = (await getApplicationDocumentsDirectory()).path;
+    Directory directory = await Directory("$path/best_pdfs").create();
+    file = File("${directory.path}/best_pdf_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf"); // Include today's date in iOS file name
+  } else {
+    throw UnsupportedError("Unsupported platform");
   }
+
+     // Delete file if it already exists
+  if (await file.exists()) {
+    try {
+      await file.delete();
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  // Write PDF content to file
+  await file.writeAsBytes(await pdf.save());
+
+  // Show a Snackbar confirming PDF saved with its path
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('PDF saved at ${file.path}')),
+  );
+
+  return file.path; // Return the file path
+}
 }
 
 class _ChartData {

@@ -12,8 +12,8 @@ import 'package:pheasant_house/screen/notification/notificationscreen.dart';
 
 class MainScreen extends StatefulWidget {
   final String farmName;
-
-  const MainScreen({super.key, required this.farmName});
+  final String userEmail;
+  const MainScreen({super.key, required this.farmName,required this.userEmail});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -457,7 +457,7 @@ class _MainScreenState extends State<MainScreen> {
           MaterialPageRoute(
             builder: (context) => MenuScreen(
                 farmName:
-                    widget.farmName), // ส่งชื่อโรงเรือนผ่านพารามิเตอร์ farmName
+                    widget.farmName,userEmail:widget.userEmail), // ส่งชื่อโรงเรือนผ่านพารามิเตอร์ farmName
           ),
         );
       },

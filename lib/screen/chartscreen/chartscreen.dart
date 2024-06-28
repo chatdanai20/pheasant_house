@@ -255,10 +255,10 @@ class ChartScreenState extends State<ChartScreen> {
         const SizedBox(
           height: 20,
         ),
-        InkWell(
-          onTap: () => generatePDF(),
-          child: bottom(context, kContainerPDFColor, 'testPDF'),
-        ),
+        // InkWell(
+        //   onTap: () => generatePDF(),
+        //   child: bottom(context, kContainerPDFColor, 'testPDF'),
+        // ),
       ],
     );
   }
@@ -399,7 +399,7 @@ class ChartScreenState extends State<ChartScreen> {
         .collection('environment');
 
     // Parse monthYear to DateTime
-    DateTime selectedMonth = DateFormat('MM/yyyy').parse(monthYear);
+    DateTime selectedMonth = DateFormat('M/yyyy').parse(monthYear);
 
     DateTime startOfMonth =
         DateTime(selectedMonth.year, selectedMonth.month, 1);
@@ -408,8 +408,8 @@ class ChartScreenState extends State<ChartScreen> {
             .subtract(Duration(days: 1));
 
     // จัดรูปแบบวันที่สำหรับคิวรี Firestore
-    String startDateString = DateFormat('yyyy-MM-dd').format(startOfMonth);
-    String endDateString = DateFormat('yyyy-MM-dd').format(endOfMonth);
+    String startDateString = DateFormat('yyyy-M-dd').format(startOfMonth);
+    String endDateString = DateFormat('yyyy-M-dd').format(endOfMonth);
 
     // คิวรี Firestore เพื่อดึงเอกสารภายในเดือนที่ระบุ
     QuerySnapshot querySnapshot = await environment
@@ -425,7 +425,7 @@ class ChartScreenState extends State<ChartScreen> {
       String docId = doc.id;
       List<String> parts = docId.split('_');
       String dateString = parts[0];
-      DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+      DateTime dateTime = DateFormat('yyyy-M-dd').parse(dateString);
       // Skip documents with docId 'now' or dates outside selected month
       if (docId == 'now' ||
           dateTime.isBefore(startOfMonth) ||
@@ -478,10 +478,10 @@ class ChartScreenState extends State<ChartScreen> {
 
     // Calculate averages and format data for each day in dailyData
     dailyData.forEach((date, dayData) {
-      double luxMorningAvg = _calculateAverage(dayData['lux_morning']!);
-      double luxNoonAvg = _calculateAverage(dayData['lux_noon']!);
-      double luxEveningAvg = _calculateAverage(dayData['lux_evening']!);
-      double tempAvg = _calculateAverage(dayData['temperature']!) / 10;
+      double luxMorningAvg = _calculateAverage(dayData['lux_morning']!)/1000;
+      double luxNoonAvg = _calculateAverage(dayData['lux_noon']!)/1000;
+      double luxEveningAvg = _calculateAverage(dayData['lux_evening']!)/1000;
+      double tempAvg = _calculateAverage(dayData['temperature']!) ;
       double humidityAvg = _calculateAverage(dayData['humidity']!) / 10;
       double soilMoistureAvg = _calculateAverage(dayData['soilmoisture']!) / 10;
       double ppmAvg = _calculateAverage(dayData['ppm']!);
@@ -535,7 +535,7 @@ class ChartScreenState extends State<ChartScreen> {
                     Navigator.of(context).pop();
                   },
                 );
-              },
+              }, 
             ),
           ),
           actions: [
@@ -677,14 +677,14 @@ class ChartScreenState extends State<ChartScreen> {
 
     // Get the downloads directory
     final directory = await getExternalStorageDirectory();
-    final path = '${directory!.path}/Download/test.xlsx';
+    final path = '${directory!.path}/Download/test1.xlsx';
     final file = File(path);
 
     var fileBytes = excel.save();
     file
       ..createSync(recursive: true)
       ..writeAsBytesSync(fileBytes!);
-
+    //print(environmentData);
     print('File saved to $path');
     // Show toast notification
     Fluttertoast.showToast(
@@ -703,128 +703,128 @@ class ChartScreenState extends State<ChartScreen> {
     return data.buffer.asUint8List();
   }
 
-  Future<void> generatePDF() async {
-    await initializeDateFormatting('th_TH'); // Initialize Thai date formatting
+  // Future<void> generatePDF() async {
+  //   await initializeDateFormatting('th_TH'); // Initialize Thai date formatting
 
-    final pdf = pw.Document();
+  //   final pdf = pw.Document();
 
-    final fontData = await loadFont('asset/fonts/THSarabunNew.ttf');
-    final ttf = pw.Font.ttf(ByteData.sublistView(fontData));
+  //   final fontData = await loadFont('asset/fonts/THSarabunNew.ttf');
+  //   final ttf = pw.Font.ttf(ByteData.sublistView(fontData));
 
-    final logoImage = pw.MemoryImage(
-      (await rootBundle.load('asset/images/Logo2.png')).buffer.asUint8List(),
-    );
+  //   final logoImage = pw.MemoryImage(
+  //     (await rootBundle.load('asset/images/Logo2.png')).buffer.asUint8List(),
+  //   );
 
-    String username = widget.email;
-    String farmName = widget.farmName;
-    DocumentSnapshot<Map<String, dynamic>> userData =
-        await FirebaseFirestore.instance.collection('User').doc(username).get();
+  //   String username = widget.email;
+  //   String farmName = widget.farmName;
+  //   DocumentSnapshot<Map<String, dynamic>> userData =
+  //       await FirebaseFirestore.instance.collection('User').doc(username).get();
 
-    DateTime now = DateTime.now();
-    String formattedDate = DateFormat.yMMMM('th_TH').format(DateTime(
-        now.year + 543,
-        now.month,
-        now.day)); // ใช้ DateFormat ภาษาไทยและเพิ่ม 543 ปี
+  //   DateTime now = DateTime.now();
+  //   String formattedDate = DateFormat.yMMMM('th_TH').format(DateTime(
+  //       now.year + 543,
+  //       now.month,
+  //       now.day)); // ใช้ DateFormat ภาษาไทยและเพิ่ม 543 ปี
 
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Stack(
-            children: [
-              pw.Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.center,
-                  children: [
-                    pw.Image(logoImage, width: 130, height: 100),
-                    pw.SizedBox(height: 10),
-                    pw.Text(
-                      'โรงเรือน: $farmName',
-                      style: pw.TextStyle(font: ttf, fontSize: 16),
-                    ),
-                    pw.Text(
-                      'เดือนและปี: $formattedDate',
-                      style: pw.TextStyle(font: ttf, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-              pw.Positioned(
-                bottom: 50,
-                right: 0, // จุดลงชื่ออยู่ทางขวาล่าง
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.end, // ชิดขวา
-                  children: [
-                    pw.Text(
-                      'ลงชื่อ: ____________________________',
-                      style: pw.TextStyle(font: ttf, fontSize: 16),
-                    ),
-                    pw.SizedBox(height: 10),
-                    pw.Container(
-                      alignment: pw.Alignment.center,
-                      width: 200, // กำหนดความกว้างเพื่อให้ข้อความอยู่ตรงกลาง
-                      child: pw.Text(
-                        '     ${userData['name'] ?? 'N/A'}      ${userData['lastname'] ?? 'N/A'}',
-                        style: pw.TextStyle(font: ttf, fontSize: 16),
-                        textAlign: pw.TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              pw.Positioned(
-                bottom: 50,
-                left: 0, // ข้อมูลเพิ่มเติมอยู่ทางซ้ายล่าง
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start, // ชิดซ้าย
-                  children: [
-                    pw.Text(
-                      'ข้อมูลเพิ่มเติม:',
-                      style: pw.TextStyle(font: ttf, fontSize: 16),
-                    ),
-                    //pw.SizedBox(height: 10),
-                    pw.Text(
-                      'ชื่อ: ${userData['name'] ?? 'N/A'} นามสกุล:  ${userData['lastname'] ?? 'N/A'}',
-                      style: pw.TextStyle(font: ttf, fontSize: 16),
-                    ),
-                    pw.Text(
-                      'Email: $username',
-                      style: pw.TextStyle(font: ttf, fontSize: 16),
-                    ),
-                    pw.Text(
-                      'โทร: ${userData['phone'] ?? 'N/A'}',
-                      style: pw.TextStyle(font: ttf, fontSize: 16),
-                    ),
-                    pw.Text(
-                      'ที่อยู่: ${userData['address'] ?? 'N/A'}',
-                      style: pw.TextStyle(font: ttf, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
+  //   pdf.addPage(
+  //     pw.Page(
+  //       build: (pw.Context context) {
+  //         return pw.Stack(
+  //           children: [
+  //             pw.Positioned(
+  //               top: 0,
+  //               left: 0,
+  //               right: 0,
+  //               child: pw.Column(
+  //                 crossAxisAlignment: pw.CrossAxisAlignment.center,
+  //                 children: [
+  //                   pw.Image(logoImage, width: 130, height: 100),
+  //                   pw.SizedBox(height: 10),
+  //                   pw.Text(
+  //                     'โรงเรือน: $farmName',
+  //                     style: pw.TextStyle(font: ttf, fontSize: 16),
+  //                   ),
+  //                   pw.Text(
+  //                     'เดือนและปี: $formattedDate',
+  //                     style: pw.TextStyle(font: ttf, fontSize: 16),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //             pw.Positioned(
+  //               bottom: 50,
+  //               right: 0, // จุดลงชื่ออยู่ทางขวาล่าง
+  //               child: pw.Column(
+  //                 crossAxisAlignment: pw.CrossAxisAlignment.end, // ชิดขวา
+  //                 children: [
+  //                   pw.Text(
+  //                     'ลงชื่อ: ____________________________',
+  //                     style: pw.TextStyle(font: ttf, fontSize: 16),
+  //                   ),
+  //                   pw.SizedBox(height: 10),
+  //                   pw.Container(
+  //                     alignment: pw.Alignment.center,
+  //                     width: 200, // กำหนดความกว้างเพื่อให้ข้อความอยู่ตรงกลาง
+  //                     child: pw.Text(
+  //                       '     ${userData['name'] ?? 'N/A'}      ${userData['lastname'] ?? 'N/A'}',
+  //                       style: pw.TextStyle(font: ttf, fontSize: 16),
+  //                       textAlign: pw.TextAlign.center,
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //             pw.Positioned(
+  //               bottom: 50,
+  //               left: 0, // ข้อมูลเพิ่มเติมอยู่ทางซ้ายล่าง
+  //               child: pw.Column(
+  //                 crossAxisAlignment: pw.CrossAxisAlignment.start, // ชิดซ้าย
+  //                 children: [
+  //                   pw.Text(
+  //                     'ข้อมูลเพิ่มเติม:',
+  //                     style: pw.TextStyle(font: ttf, fontSize: 16),
+  //                   ),
+  //                   //pw.SizedBox(height: 10),
+  //                   pw.Text(
+  //                     'ชื่อ: ${userData['name'] ?? 'N/A'} นามสกุล:  ${userData['lastname'] ?? 'N/A'}',
+  //                     style: pw.TextStyle(font: ttf, fontSize: 16),
+  //                   ),
+  //                   pw.Text(
+  //                     'Email: $username',
+  //                     style: pw.TextStyle(font: ttf, fontSize: 16),
+  //                   ),
+  //                   pw.Text(
+  //                     'โทร: ${userData['phone'] ?? 'N/A'}',
+  //                     style: pw.TextStyle(font: ttf, fontSize: 16),
+  //                   ),
+  //                   pw.Text(
+  //                     'ที่อยู่: ${userData['address'] ?? 'N/A'}',
+  //                     style: pw.TextStyle(font: ttf, fontSize: 16),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     ),
+  //   );
 
-    // บันทึกไฟล์ PDF ลงในอุปกรณ์
-    final output = await getExternalStorageDirectory();
-    final file = File('${output?.path}/example_thai.pdf');
-    await file.writeAsBytes(await pdf.save());
+  //   // บันทึกไฟล์ PDF ลงในอุปกรณ์
+  //   final output = await getExternalStorageDirectory();
+  //   final file = File('${output?.path}/example_thai.pdf');
+  //   await file.writeAsBytes(await pdf.save());
 
-    // ตรวจสอบ path ของไฟล์ที่บันทึก
-    print('Path to saved PDF: ${file.path}');
-    Fluttertoast.showToast(
-      msg: "File saved to ${file.path}",
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-  }
+  //   // ตรวจสอบ path ของไฟล์ที่บันทึก
+  //   print('Path to saved PDF: ${file.path}');
+  //   Fluttertoast.showToast(
+  //     msg: "File saved to ${file.path}",
+  //     toastLength: Toast.LENGTH_LONG,
+  //     gravity: ToastGravity.BOTTOM,
+  //     timeInSecForIosWeb: 1,
+  //     backgroundColor: Colors.black,
+  //     textColor: Colors.white,
+  //     fontSize: 16.0,
+  //   );
+  // }
 }

@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late User? _user;
-  late String _userEmail = '';
+  late String userEmail = '';
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _houseNameController = TextEditingController();
   bool hasNotification = false;
@@ -25,14 +25,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _user = FirebaseAuth.instance.currentUser;
-    _userEmail = _user?.email ?? '';
+    userEmail = _user?.email ?? '';
     checkForNotifications();
   }
 
   Future<void> checkForNotifications() async {
     final farmSnapshot = await FirebaseFirestore.instance
         .collection('User')
-        .doc(_userEmail)
+        .doc(userEmail)
         .collection('farm')
         .get();
 
@@ -42,13 +42,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     for (final farmDoc in farmSnapshot.docs) {
       final farmName = farmDoc.id;
-      final notifications = await _getNotificationStatus(_userEmail, farmName);
+      final notifications = await _getNotificationStatus(userEmail, farmName);
       if (notifications.isNotEmpty) {
         notificationFound = true;
         notificationCount += notifications.length;
     
         // Check the cleaning days
-        final days = await _daysUntilCleaningDay(_userEmail, farmName);
+        final days = await _daysUntilCleaningDay(userEmail, farmName);
         if (daysUntilCleaning == -1 || (days != -1 && days < daysUntilCleaning)) {
           daysUntilCleaning = days;
         }
@@ -199,10 +199,10 @@ class _HomeScreenState extends State<HomeScreen> {
     Color notificationIconColor=Colors.grey;
     
     if (_daysUntilCleaning == 0) {
-      notificationIconColor = Colors.red;
+      notificationIconColor = Colors.orange;
     } 
     if (_daysUntilCleaning > 0 && _daysUntilCleaning <= 3) {
-      notificationIconColor = Colors.orange;
+      notificationIconColor = Colors.red;
     } 
     if(_daysUntilCleaning < 0)  {
       notificationIconColor = Colors.yellow;
@@ -264,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => NotificationScreen(
-                                userEmail: _userEmail),
+                                userEmail: userEmail),
                           ),
                         ).then((_) {
                           setState(() {
@@ -391,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('User')
-                      .doc(_userEmail)
+                      .doc(userEmail)
                       .collection('farm')
                       .snapshots(),
                   builder: (context, snapshot) {
@@ -422,7 +422,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    MainScreen(farmName: houseName),
+                                    MainScreen(farmName: houseName,userEmail:userEmail),
                               ),
                             );
                           },
@@ -555,7 +555,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (houseName.isNotEmpty) {
                 var houseCollection = FirebaseFirestore.instance
                     .collection('User')
-                    .doc(_userEmail)
+                    .doc(userEmail)
                     .collection('farm');
 
                 var existingHouse = await houseCollection.doc(houseName).get();
@@ -613,7 +613,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _checkEnvironment(String houseName) async {
     var farmRef = FirebaseFirestore.instance
         .collection('User')
-        .doc(_userEmail)
+        .doc(userEmail)
         .collection('farm')
         .doc(houseName);
 
@@ -625,7 +625,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MainScreen(farmName: houseName),
+          builder: (context) => MainScreen(farmName: houseName,userEmail:userEmail),
         ),
       );
     } else {
@@ -641,7 +641,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _deleteHouse(String houseName) async {
     await FirebaseFirestore.instance
         .collection('User')
-        .doc(_userEmail)
+        .doc(userEmail)
         .collection('farm')
         .doc(houseName)
         .delete();

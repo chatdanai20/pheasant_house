@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pheasant_house/constants.dart';
@@ -6,8 +6,10 @@ import 'package:pheasant_house/screen/functionMQTT.dart/mqtt.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 class CardAmmonia extends StatefulWidget {
-  const CardAmmonia({super.key});
-
+  final String farmName;
+  final String userEmail;
+  const CardAmmonia({Key? key, required this.farmName, required this.userEmail})
+      : super(key: key);
   @override
   State<CardAmmonia> createState() => _CardAmmoniaState();
 }
@@ -27,6 +29,11 @@ class _CardAmmoniaState extends State<CardAmmonia> {
   TextEditingController sensorOpenController = TextEditingController();
   TextEditingController sensorCloseController = TextEditingController();
 
+  String openSensor = '';
+  String offSensor = '';
+  String offtime = '';
+  String ontime = '';
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +42,41 @@ class _CardAmmoniaState extends State<CardAmmonia> {
     mqttHandler.mqStream.listen((double mqValue) {
       setState(() {
         mqValue = mqValue;
+      });
+    });
+    // Fetch initial data from Firestore
+    statusControl((data) {
+      setState(() {
+        if (data != null && data.containsKey('isOpen')) {
+          isOpen = data['isOpen'];
+        }
+      });
+    });
+    statusAutoMode((data) {
+      setState(() {
+        if (data != null && data.containsKey('isAuto')) {
+          isOpen = data['isAuto'];
+        }
+      });
+    });
+    sensorMaxMin((data) {
+      setState(() {
+        if (data != null &&
+            data.containsKey('openSensor') &&
+            data.containsKey('offSensor')) {
+          openSensor = data['openSensor'];
+          offSensor = data['offSensor'];
+        }
+      });
+    });
+    timeOnOff((data) {
+      setState(() {
+        if (data != null &&
+            data.containsKey('ontime') &&
+            data.containsKey('offtime')) {
+          ontime = data['ontime'];
+          offtime = data['offtime'];
+        }
       });
     });
   }
@@ -75,6 +117,162 @@ class _CardAmmoniaState extends State<CardAmmonia> {
         MqttConnectionState.connected) {
       mqttHandler.controlRelay('esp32/relay2', 'off');
     }
+  }
+
+  Future<void> updateContorlOn() async {
+    await FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('control')
+        .doc('fan')
+        .update({'status': true});
+  }
+
+  Future<void> updateContorlOff() async {
+    await FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('control')
+        .doc('fan')
+        .update({'status': false});
+  }
+
+  Future<void> statusControl(Function(Map<String, dynamic>?) callback) async {
+    DocumentReference<Map<String, dynamic>> status = FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('control')
+        .doc('fan');
+
+    DocumentSnapshot<Map<String, dynamic>> querySnapshot = await status.get();
+    bool lightstatus = querySnapshot.data()?['status'] ?? false;
+    setState(() {
+      isOpen = lightstatus;
+    });
+  }
+
+  Future<void> autoModeOn() async {
+    await FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('control')
+        .doc('Automode')
+        .update({'status': true});
+  }
+
+  Future<void> autoModeOff() async {
+    await FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('control')
+        .doc('Automode')
+        .update({'status': false});
+  }
+
+  Future<void> statusAutoMode(Function(Map<String, dynamic>?) callback) async {
+    DocumentReference<Map<String, dynamic>> status = FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('control')
+        .doc('Automode');
+
+    DocumentSnapshot<Map<String, dynamic>> querySnapshot = await status.get();
+    bool autoModeStatus = querySnapshot.data()?['status'] ?? false;
+    setState(() {
+      isAuto = autoModeStatus;
+    });
+  }
+
+  Future<void> sensorMax(String sensorOpenToSend) async {
+    await FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('sensor')
+        .doc('ammonia')
+        .update({'sensor_max': '${sensorOpenToSend}'});
+  }
+
+  Future<void> sensorMin(String sensorCloseToSend) async {
+    await FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('sensor')
+        .doc('ammonia')
+        .update({'sensor_min': '${sensorCloseToSend}'});
+  }
+
+  Future<void> sensorMaxMin(Function(Map<String, dynamic>?) callback) async {
+    DocumentReference<Map<String, dynamic>> status = FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('sensor')
+        .doc('ammonia');
+
+    DocumentSnapshot<Map<String, dynamic>> querySnapshot = await status.get();
+    String open_Sensor = querySnapshot.data()?['sensor_max'] ?? null;
+    String off_Sensor = querySnapshot.data()?['sensor_min'] ?? null;
+    setState(() {
+      openSensor = open_Sensor;
+      offSensor = off_Sensor;
+    });
+  }
+
+  Future<void> timeOn(String openingTimeToSend) async {
+    await FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('time')
+        .doc('fan')
+        .update({'time_on': '${openingTimeToSend}'});
+  }
+
+  Future<void> timeOff(String closingTimeToSend) async {
+    await FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('time')
+        .doc('fan')
+        .update({'time_off': '${closingTimeToSend}'});
+  }
+
+  Future<void> timeOnOff(Function(Map<String, dynamic>?) callback) async {
+    DocumentReference<Map<String, dynamic>> status = FirebaseFirestore.instance
+        .collection('User')
+        .doc(widget.userEmail)
+        .collection('farm')
+        .doc(widget.farmName)
+        .collection('time')
+        .doc('fan');
+
+    DocumentSnapshot<Map<String, dynamic>> querySnapshot = await status.get();
+    String time_on = querySnapshot.data()?['time_on'] ?? null;
+    String time_off = querySnapshot.data()?['time_off'] ?? null;
+    setState(() {
+      ontime = time_on;
+      offtime = time_off;
+    });
   }
 
   @override
@@ -148,8 +346,10 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                       isOpen = value;
                       if (isOpen) {
                         turnOnRelay2();
+                        updateContorlOn();
                       } else {
                         turnOffRelay2();
+                        updateContorlOff();
                       }
                     },
                   );
@@ -179,8 +379,10 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                       isAuto = value;
                       if (isAuto) {
                         switchToAutoMode();
+                        autoModeOn();
                       } else {
                         switchToManualMode();
+                        autoModeOff();
                       }
                     },
                   );
@@ -258,49 +460,50 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                                           closingTimeMessage =
                                               '${selectedCloseHour}:${selectedCloseMinute}';
                                         });
-                                         String openingTimeToSend =
+                                        String openingTimeToSend =
                                             selectedOpenHour != 0 ||
                                                     selectedOpenMinute != 0
                                                 ? '${selectedOpenHour}:${selectedOpenMinute}'
                                                 : 'null';
+                                        timeOn(openingTimeToSend);
 
                                         String closingTimeToSend =
                                             selectedCloseHour != 0 ||
                                                     selectedCloseMinute != 0
                                                 ? '${selectedCloseHour}:${selectedCloseMinute}'
                                                 : 'null';
+                                        timeOff(closingTimeToSend);
 
                                         String sensorOpenToSend =
                                             sensorOpenController.text.isNotEmpty
                                                 ? sensorOpenController.text
                                                 : 'null';
+                                        sensorMax(sensorOpenToSend);
 
                                         String sensorCloseToSend =
                                             sensorCloseController
                                                     .text.isNotEmpty
                                                 ? sensorCloseController.text
                                                 : 'null';
+                                        sensorMin(sensorCloseToSend);
+
                                         mqttHandler.sendSensorValue(
-                                            'esp32/minppm',
-                                            sensorOpenToSend);
+                                            'esp32/minppm', sensorOpenToSend);
                                         mqttHandler.sendSensorValue(
-                                            'esp32/maxppm',
-                                            sensorCloseToSend);
+                                            'esp32/maxppm', sensorCloseToSend);
                                         mqttHandler.sendAutoModeCommand(
-                                            'esp32/fanon',
-                                            openingTimeToSend);
+                                            'esp32/fanon', openingTimeToSend);
                                         mqttHandler.sendAutoModeCommand(
-                                            'esp32/fanoff',
-                                            closingTimeToSend );
+                                            'esp32/fanoff', closingTimeToSend);
                                         Navigator.pop(context);
                                       },
                                     ),
                                   ],
                                 ),
                               ),
-                              buildInputText('ค่าเซนเซอร์เปิด ', 'แอมโมเนีย',
+                              buildInputText('ค่าเซนเซอร์เปิด ', 'ppm',
                                   sensorOpenController),
-                              buildInputText('ค่าเซนเซอร์ปิด ', 'แอมโมเนีย',
+                              buildInputText('ค่าเซนเซอร์ปิด ', 'ppm',
                                   sensorCloseController),
                               const SizedBox(
                                 height: 10,
@@ -356,7 +559,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                                   ),
                                 ],
                               ),
-                               SizedBox(height: 20),
+                              SizedBox(height: 20),
                               // Displaying sensor values for testing
                               Text('Sensor Open: ${sensorOpenController.text}'),
                               Text(
@@ -386,9 +589,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                 ),
               ),
               Text(
-                sensorOpenController.text.isNotEmpty
-                    ? ' ${sensorOpenController.text} °C'
-                    : ' null',
+                '${openSensor} ppm',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -410,9 +611,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                 ),
               ),
               Text(
-                sensorCloseController.text.isNotEmpty
-                    ? ' ${sensorCloseController.text} °C'
-                    : ' null',
+                '${offSensor} ppm',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -434,7 +633,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                 ),
               ),
               Text(
-                openingTimeMessage != 'null' ? ' $openingTimeMessage' : ' null',
+                '$ontime' ,
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,
@@ -456,7 +655,7 @@ class _CardAmmoniaState extends State<CardAmmonia> {
                 ),
               ),
               Text(
-                closingTimeMessage != 'null' ? ' $closingTimeMessage' : ' null',
+                '$offtime',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,

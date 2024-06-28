@@ -1,6 +1,5 @@
 // mqtt.dart
 import 'dart:async';
-
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
@@ -46,16 +45,41 @@ class MqttHandler {
   }
 
   // Set up MQTT connection and subscriptions
-  void _setupMqtt() {
+  void _setupMqtt() async {
     client.logging(on: false);
-    // client.onConnected = onConnected;
+    client.onConnected = onConnected;
     client.onDisconnected = onDisconnected;
     client.onUnsubscribed = onUnsubscribed;
-    client.connect();
+    client.onSubscribed = onSubscribed;
+    client.pongCallback = pong;
+
+    final connMess = MqttConnectMessage()
+        .withClientIdentifier(clientId)
+        .startClean() // Non persistent session for testing
+        .withWillTopic('willtopic') // If you set this you must set a will message
+        .withWillMessage('My Will message')
+        .withWillQos(MqttQos.atLeastOnce);
+    client.connectionMessage = connMess;
+
+    try {
+      await client.connect();
+    } catch (e) {
+      print('Exception: $e');
+      client.disconnect();
+    }
+
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      print('MQTT client connected');
+    } else {
+      print(
+          'ERROR: MQTT client connection failed - disconnecting, status is ${client.connectionStatus}');
+      client.disconnect();
+    }
   }
 
   // Callback on successful MQTT connection
   void onConnected() {
+    print('Connected');
     // Subscribe to different sensor topics
     client.subscribe(tempTopic, MqttQos.atLeastOnce);
     client.subscribe(humidityTopic, MqttQos.atLeastOnce);
@@ -64,24 +88,37 @@ class MqttHandler {
     client.subscribe(soilTopic, MqttQos.atLeastOnce);
 
     // Listen for incoming messages and handle them
-    //   client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
-    //     final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
-    //     final String payload =
-    //         MqttPublishPayload.bytesToStringAsString(message.payload.message);
-    //     final String topic = c[0].topic;
-    //     handleMessage(topic, payload);
-    //   });
+    client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+      final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
+      final String payload =
+          MqttPublishPayload.bytesToStringAsString(message.payload.message);
+      final String topic = c[0].topic;
+      handleMessage(topic, payload);
+    });
   }
 
   // Callback on MQTT disconnection
   void onDisconnected() {
+    print('Disconnected');
     // Handle disconnection
   }
 
   // Callback on unsubscribing from a topic
-  void onUnsubscribed(String? topic) {}
+  void onUnsubscribed(String? topic) {
+    print('Unsubscribed topic: $topic');
+  }
 
-  // // Handle incoming MQTT messages based on topic
+  // Callback on subscribing to a topic
+  void onSubscribed(String topic) {
+    print('Subscribed topic: $topic');
+  }
+
+  // Pong callback
+  void pong() {
+    print('Ping response client callback invoked');
+  }
+
+  // Handle incoming MQTT messages based on topic
   void handleMessage(String topic, String payload) {
     double value = double.tryParse(payload) ?? 0.0;
 
@@ -108,6 +145,8 @@ class MqttHandler {
       final builder = MqttClientPayloadBuilder();
       builder.addString(value);
       client.publishMessage(topic, MqttQos.atLeastOnce, builder.payload!);
+    } else {
+      print("MQTT is not connected. Cannot send message.");
     }
   }
 
@@ -115,14 +154,22 @@ class MqttHandler {
   void controlRelay(String topic, String command) {
     final builder = MqttClientPayloadBuilder();
     builder.addString(command);
-    client.publishMessage(topic, MqttQos.exactlyOnce, builder.payload!);
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      client.publishMessage(topic, MqttQos.exactlyOnce, builder.payload!);
+    } else {
+      print("MQTT is not connected. Cannot send message.");
+    }
   }
 
   // Send MQTT command for automatic mode
   void sendAutoModeCommand(String topic, String command) {
     final builder = MqttClientPayloadBuilder();
     builder.addString(command);
-    client.publishMessage(topic, MqttQos.exactlyOnce, builder.payload!);
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      client.publishMessage(topic, MqttQos.exactlyOnce, builder.payload!);
+    } else {
+      print("MQTT is not connected. Cannot send message.");
+    }
   }
 
   // Connect and subscribe to MQTT topics

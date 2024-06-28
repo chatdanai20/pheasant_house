@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pheasant_house/constants.dart';
 import 'package:pheasant_house/screen/customcard/cardclean.dart';
+import 'package:pheasant_house/screen/functionMQTT.dart/creatdata.dart';
 
 import '../customcard/card-clean-roof.dart';
 import '../customcard/cardHeat.dart';
@@ -11,8 +12,9 @@ import 'package:pheasant_house/screen/customcard/cardnotitemp.dart';
 
 class MenuScreen extends StatefulWidget {
   final String farmName; // เพิ่มพารามิเตอร์ farmName ในคอนสตรักเตอร์
-
-  const MenuScreen({Key? key, required this.farmName}) : super(key: key);
+  final String userEmail;
+  const MenuScreen({Key? key, required this.farmName, required this.userEmail})
+      : super(key: key);
 
   @override
   _MenuScreenState createState() => _MenuScreenState();
@@ -25,12 +27,12 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
-    isSelected = [true, false, false, false,false,false,false];
+    isSelected = [true, false, false, false, false, false, false];
     cards = [
-      const CardHeat(),
-      const CardAmmonia(),
-      const CardMoisture(),
-      const CardCleanRoof(),
+      CardHeat(farmName: widget.farmName, userEmail: widget.userEmail),
+      CardAmmonia(farmName: widget.farmName, userEmail: widget.userEmail),
+      CardMoisture(farmName: widget.farmName, userEmail: widget.userEmail),
+      CardCleanRoof(farmName: widget.farmName, userEmail: widget.userEmail),
       CardClean(farmName: widget.farmName), // สร้าง CardClean ใน initState()
       CardNotificationTemp(farmName: widget.farmName),
       CardNotificationAmmonia(farmName: widget.farmName),
@@ -103,7 +105,7 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
           Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height ,
+            height: MediaQuery.of(context).size.height,
             decoration: const BoxDecoration(
               color: kPrimaryColor,
               borderRadius: BorderRadius.only(
@@ -116,7 +118,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 const SizedBox(
                   height: kDefaultPadding * 0.8,
                 ),
-                 SingleChildScrollView(
+                SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -194,7 +196,7 @@ class _MenuScreenState extends State<MenuScreen> {
             width: 25,
             height: 25,
             color: Colors.black,
-             // เพิ่มการปรับขนาดรูปในไอคอนสำหรับการ์ดที่ 5 และ 6
+            // เพิ่มการปรับขนาดรูปในไอคอนสำหรับการ์ดที่ 5 และ 6
             scale: (index == 5 || index == 6) ? 1.0 : 1.0,
           ),
         ),
