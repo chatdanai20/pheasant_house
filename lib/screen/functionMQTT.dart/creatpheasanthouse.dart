@@ -16,7 +16,7 @@ Future<MqttConnectionStatus> connectAndSubscribeToMQTT(String server, String cli
    
     return MqttConnectionStatus.connected;
   } catch (e) {
-    print('Failed to connect to MQTT broker: $e');
+    print('Failed to connect to MQTT broker: $e'); 
     return MqttConnectionStatus.disconnected;
   }
 }

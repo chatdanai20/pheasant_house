@@ -631,7 +631,7 @@ class _CardHeatState extends State<CardHeat> {
                 ),
               ),
               Text(
-                ' ${offSensor} °C',
+                ' ${offSensor} lux',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 20,

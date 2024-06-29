@@ -478,28 +478,28 @@ class _HomeScreenState extends State<HomeScreen> {
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('No environment data available for this house'),
+                content: Text('ไม่มีข้อมูลสภาพเเวดล้อมในโรงเรือนนี้'),
               ),
             );
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('No house found with the given name'),
+              content: Text('ไม่มีชื่อโรงเรือนนี้'),
             ),
           );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('No user found with the given email'),
+            content: Text('ไม่มีอีเมลผู้ใช้นี้'),
           ),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter both email and house name'),
+          content: Text('กรุณาใส่อีเมลและชื่อโรงเรือน'),
         ),
       );
     }
@@ -513,14 +513,14 @@ class _HomeScreenState extends State<HomeScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add New House'),
+        title: const Text('เพิ่มโรงเรือน'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: _houseNameController,
               decoration: const InputDecoration(
-                hintText: 'Enter house name',
+                hintText: 'กรอกชื่อโรงเรือน',
               ),
             ),
             // TextField(
@@ -588,8 +588,8 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm Delete'),
-          content: Text('Are you sure you want to delete $houseName?'),
+          title: const Text('ยืนยันการลบโรงเรือน'),
+          content: Text('ยืนยันการลบโรงเรือน $houseName?'),
           actions: <Widget>[
             TextButton(
               child: const Text('Cancel'),
@@ -632,7 +632,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('No environment data available for $houseName'),
+          content: Text('ไม่มีข้อมูลสภาพเเวดล้อมใน $houseName'),
         ),
       );
     }
